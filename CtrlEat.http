@@ -1,0 +1,6 @@
+@CtrlEat_HostAddress = http://localhost:5161
+
+GET {{CtrlEat_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
