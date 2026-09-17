@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CtrlEat")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c6c37a4f40b599d5c94dbfff2ed17f05f1343c84")]
 [assembly: System.Reflection.AssemblyProductAttribute("CtrlEat")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CtrlEat")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
