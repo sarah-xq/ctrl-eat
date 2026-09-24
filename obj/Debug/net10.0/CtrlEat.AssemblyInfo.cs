@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CtrlEat")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+88fca52a599d286f4d256008cbd7fd2fd202620c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+84500b5c399eb2238533a1820ce8caa54d7c7dd4")]
 [assembly: System.Reflection.AssemblyProductAttribute("CtrlEat")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CtrlEat")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
