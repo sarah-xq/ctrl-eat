@@ -1,11 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "Sf6HVpdGmho=",
+  "dgSpecHash": "2y5gG/9f26I=",
   "success": true,
-  "projectFilePath": "C:\\Users\\sarah\\source\\repos\\CtrlEat\\CtrlEat.csproj",
+  "projectFilePath": "C:\\Users\\sarah\\source\\repos\\sarah-xq\\ctrl-eat\\CtrlEat.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\sarah\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.11\\microsoft.aspnetcore.openapi.10.0.11.nupkg.sha512",
-    "C:\\Users\\sarah\\.nuget\\packages\\microsoft.openapi\\2.7.5\\microsoft.openapi.2.7.5.nupkg.sha512"
+    "C:\\Users\\sarah\\.nuget\\packages\\microsoft.openapi\\2.7.5\\microsoft.openapi.2.7.5.nupkg.sha512",
+    "C:\\Users\\sarah\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\10.2.3\\swashbuckle.aspnetcore.swagger.10.2.3.nupkg.sha512",
+    "C:\\Users\\sarah\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\10.2.3\\swashbuckle.aspnetcore.swaggergen.10.2.3.nupkg.sha512",
+    "C:\\Users\\sarah\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\10.2.3\\swashbuckle.aspnetcore.swaggerui.10.2.3.nupkg.sha512"
   ],
   "logs": []
 }
