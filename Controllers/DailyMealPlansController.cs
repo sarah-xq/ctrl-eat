@@ -80,6 +80,7 @@ namespace CtrlEat.Controllers
 
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(DailyMealPlanResponse), 200)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public ActionResult<DailyMealPlanResponse> UpdateDailyMealPlan([FromRoute] int id, [FromBody] UpdateDailyMealPlanRequest request)
         {
@@ -87,6 +88,10 @@ namespace CtrlEat.Controllers
             {
                 var plan = _service.UpdateDailyMealPlan(id, request);
                 return Ok(plan);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
             }
             catch (InvalidOperationException ex)
             {
