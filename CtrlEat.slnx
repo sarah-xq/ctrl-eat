@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="CtrlEat.csproj" />
+  <Project Path="CtrlEat.Tests/CtrlEat.Tests.csproj" />
 </Solution>

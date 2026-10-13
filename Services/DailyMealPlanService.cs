@@ -44,6 +44,7 @@ namespace CtrlEat.Services
                 }).ToList() ?? new List<SnackItem>()
             };
 
+            ValidateReferences(plan);
             plan.TotalCalories = CalculateTotalCalories(plan);
 
             var id = _repository.Create(plan);
@@ -92,23 +93,30 @@ namespace CtrlEat.Services
             var existing = _repository.GetById(id);
             if (existing == null) throw new InvalidOperationException($"DailyMealPlan with id {id} not found");
 
-            if (request.BreakfastRecipeId.HasValue) existing.BreakfastRecipeId = request.BreakfastRecipeId;
-            if (request.LunchRecipeId.HasValue) existing.LunchRecipeId = request.LunchRecipeId;
-            if (request.DinnerRecipeId.HasValue) existing.DinnerRecipeId = request.DinnerRecipeId;
-            if (request.Date.HasValue) existing.Date = request.Date.Value.Date;
-
-            existing.Snacks = request.Snacks?.Select(s => new SnackItem
+            var updated = new DailyMealPlan
             {
-                IsRecipe = s.IsRecipe,
-                ItemId = s.ItemId,
-                Quantity = s.Quantity,
-                Unit = s.Unit
-            }).ToList() ?? new List<SnackItem>();
+                Id = existing.Id,
+                UserId = existing.UserId,
+                BreakfastRecipeId = request.BreakfastRecipeId ?? existing.BreakfastRecipeId,
+                LunchRecipeId = request.LunchRecipeId ?? existing.LunchRecipeId,
+                DinnerRecipeId = request.DinnerRecipeId ?? existing.DinnerRecipeId,
+                Date = request.Date?.Date ?? existing.Date,
+                CreatedAt = existing.CreatedAt,
+                UpdatedAt = existing.UpdatedAt,
+                Snacks = request.Snacks?.Select(s => new SnackItem
+                {
+                    IsRecipe = s.IsRecipe,
+                    ItemId = s.ItemId,
+                    Quantity = s.Quantity,
+                    Unit = s.Unit
+                }).ToList() ?? new List<SnackItem>()
+            };
 
-            existing.TotalCalories = CalculateTotalCalories(existing);
+            ValidateReferences(updated);
+            updated.TotalCalories = CalculateTotalCalories(updated);
 
-            _repository.Update(existing);
-            return MapToResponse(existing);
+            _repository.Update(updated);
+            return MapToResponse(updated);
         }
 
         public void DeleteDailyMealPlan(int id)
@@ -140,31 +148,58 @@ namespace CtrlEat.Services
             {
                 if (snack.IsRecipe)
                 {
-                    try
-                    {
-                        var r = _recipeService.GetRecipe(snack.ItemId);
-                        total += r.TotalCalories * snack.Quantity;
-                    }
-                    catch
-                    {
-                        // ignore missing recipe
-                    }
+                    var r = _recipeService.GetRecipe(snack.ItemId);
+                    total += r.TotalCalories * snack.Quantity;
                 }
                 else
                 {
-                    try
-                    {
-                        var ing = _ingredientService.GetIngredientForLookup(snack.ItemId);
-                        total += ing.Calories * snack.Quantity;
-                    }
-                    catch
-                    {
-                        // ignore missing ingredient
-                    }
+                    var ing = _ingredientService.GetIngredientForLookup(snack.ItemId);
+                    total += ing.Calories * snack.Quantity;
                 }
             }
 
             return total;
+        }
+
+        private void ValidateReferences(DailyMealPlan plan)
+        {
+            ValidateRecipeReference(plan.BreakfastRecipeId, nameof(plan.BreakfastRecipeId));
+            ValidateRecipeReference(plan.LunchRecipeId, nameof(plan.LunchRecipeId));
+            ValidateRecipeReference(plan.DinnerRecipeId, nameof(plan.DinnerRecipeId));
+
+            var snacks = plan.Snacks ?? new List<SnackItem>();
+            for (var index = 0; index < snacks.Count; index++)
+            {
+                var snack = snacks[index];
+                var field = $"Snacks[{index}].ItemId";
+
+                try
+                {
+                    if (snack.IsRecipe)
+                        _recipeService.GetRecipe(snack.ItemId);
+                    else
+                        _ingredientService.GetIngredientForLookup(snack.ItemId);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    var referenceType = snack.IsRecipe ? "recipe" : "ingredient";
+                    throw new ArgumentException($"Invalid {field}: {referenceType} ID {snack.ItemId} was not found.", field, ex);
+                }
+            }
+        }
+
+        private void ValidateRecipeReference(int? recipeId, string field)
+        {
+            if (!recipeId.HasValue) return;
+
+            try
+            {
+                _recipeService.GetRecipe(recipeId.Value);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new ArgumentException($"Invalid {field}: recipe ID {recipeId.Value} was not found.", field, ex);
+            }
         }
 
         private DailyMealPlanResponse MapToResponse(DailyMealPlan plan)
