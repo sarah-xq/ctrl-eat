@@ -1,29 +1,13 @@
 ---
 name: ctrl-eat-research
-description: Research a Ctrl+Eat API feature, bug, or issue before planning or changing code. Use for a read-only investigation of current behavior, code paths, project conventions, and open questions.
+description: Read-only investigation for Ctrl+Eat Milestone 3 layered services, EF Core migrations, REST APIs and frontend features.
 ---
 
 # Ctrl+Eat Research
+1. Read the specific work item, user story and acceptance criteria.
+2. Inspect affected existing files: controllers, service classes, JSON repositories, models, DTOs, tests, configuration, and related calls. Check which new layered projects already exist; do not assume the migration is finished.
+3. Trace **current** behavior and compare to the **required** Domain -> Data -> API separation and HTTP-only Client integration. Note where business rules live, cross-service references, and authentication requirements.
+4. Identify shared API contracts and any breaking changes before parallel implementation.
+5. Return **Goal, Verified current behavior (paths), Intended target, Dependencies, Likely changes, Tests, Open decisions**. Separate facts from assumptions.
 
-Research the requested change without editing project files. The goal is to give the user and the planning stage an accurate picture of the existing code, not to guess at an implementation.
-
-## Steps
-
-1. Read the complete issue, acceptance criteria, or user description. Separate explicit requirements from assumptions.
-2. Search for related endpoints, DTOs, services, repositories, models, tests, configuration, and callers. Inspect the relevant files rather than relying on names or summaries alone.
-3. Trace the current request and data flow. For this project, check the applicable controller → service → repository path and any related JSON data or cross-service call.
-4. Check nearby code for established naming, validation, status-code, and error-handling patterns. Note gaps in test coverage.
-5. Identify the smallest plausible set of files or layers affected, risks, and decisions that need the user's input.
-
-## Handoff
-
-Return a concise Markdown research note with:
-
-- **Goal and acceptance criteria:** what the request explicitly asks for.
-- **Current behavior:** relevant endpoint and data flow, with file paths.
-- **Constraints and conventions:** patterns or dependencies that the plan should preserve.
-- **Likely change surface:** files/layers that may need work and why.
-- **Validation opportunities:** existing tests and practical build or API checks.
-- **Open questions and assumptions:** ask only about choices that materially affect behavior or architecture.
-
-Do not edit code, generate a solution, or silently turn an assumption into a requirement. This handoff feeds `ctrl-eat-plan`.
+Read-only; do not edit code or invent implementation results.
