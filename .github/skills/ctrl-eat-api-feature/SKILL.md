@@ -1,90 +1,32 @@
 ---
 name: ctrl-eat-api-feature
-description: Research, plan, implement, and validate small API features in the Ctrl+Eat ASP.NET Core Web API. Use this skill when adding or modifying controllers, services, repositories, DTOs, models, or tests.
+description: Run the complete R-PIV workflow for a feature or bug in the Ctrl+Eat ASP.NET Core API. Use when a request needs research, a reviewed plan, implementation, and validation.
 ---
 
-# Ctrl+Eat API Feature Skill
+# Ctrl+Eat API Feature Workflow
 
-Use this workflow when implementing a small feature or GitHub issue in
-the Ctrl+Eat project.
+Use this skill as the entry point for a feature or bug that changes the Ctrl+Eat API. **R-PIV means Research, Plan, Implement, Validate.** It coordinates the four focused skills in this folder: `ctrl-eat-research`, `ctrl-eat-plan`, `ctrl-eat-implement`, and `ctrl-eat-validate`.
 
-## 1. Research
+## Workflow and handoffs
 
-Before changing code:
+1. **Research:** Inspect the issue and relevant code without editing files. Return the current behavior, constraints, likely files, and unanswered questions. Use `ctrl-eat-research`.
+2. **Plan:** Turn the confirmed requirements and research into a small, ordered plan with acceptance criteria and a validation strategy. Show it to the user and wait for approval before implementation. Use `ctrl-eat-plan`.
+3. **Implement:** Work only from the approved plan, preferably in a fresh context using the plan as the handoff. If implementation reveals a material assumption or scope change, stop and bring it back for a decision. Use `ctrl-eat-implement`.
+4. **Validate:** Compare the completed diff against the plan and run the available build and tests. Prefer a fresh conversation or agent context for this review. Use `ctrl-eat-validate`.
+5. **Evolve:** If the work exposed a repeatable gap in the project’s AI guidance, use `ctrl-eat-ai-layer-evolution` to decide whether a small reusable rule or skill improvement is justified.
 
-1. Read the complete GitHub issue.
-2. Search for related issues and existing code.
-3. Inspect the relevant controller, service, repository, DTO, and model.
-4. Explain how the current feature works.
-5. Identify the smallest set of files that may need to change.
-6. Do not modify code during the research step.
+Each stage should produce a concise Markdown handoff that can be pasted into or saved for the next stage. Keep the human involved in confirming requirements, approving the plan, and reviewing validation results. Do not automate merges, releases, or deployments.
 
-Stop and present the research findings for approval.
+## Ctrl+Eat project conventions
 
-## 2. Plan
+- Keep HTTP routing and status codes in `Controllers/`.
+- Keep validation, business rules, and orchestration in `Services/`.
+- Access JSON data through `Repositories/`; do not read or write data files directly from controllers or services.
+- Keep API contracts in `DTOs/` and domain types in `Models/`.
+- Follow the patterns of nearby files. The application currently registers JSON-backed repositories and services in `Program.cs`.
+- Do not add a database, framework, package, or architecture layer unless the approved plan requires it.
+- Keep changes tied to the current issue. Do not commit, push, open a pull request, or deploy unless the user explicitly requests that action.
 
-Create a numbered implementation plan that includes:
+## Completion report
 
-- files to modify
-- files to create
-- responsibility of each change
-- validation rules
-- expected HTTP responses
-- test cases
-- build and test commands
-
-Keep the change limited to the current GitHub issue.
-
-Do not implement the plan until it has been reviewed and approved.
-
-## 3. Implement
-
-After the plan is approved:
-
-1. Create or use a feature branch.
-2. Make one small change at a time.
-3. Keep HTTP handling in controllers.
-4. Keep business rules in services.
-5. Access JSON data only through repositories.
-6. Use DTOs for API request and response contracts.
-7. Follow the naming and error-handling style of nearby files.
-8. Do not introduce a database or new framework.
-9. Do not modify unrelated services.
-10. Summarize each meaningful change before continuing.
-
-## 4. Validate
-
-After implementation:
-
-1. Build the solution.
-2. Run all automated tests.
-3. Add tests for successful and unsuccessful behavior.
-4. Check every acceptance criterion from the GitHub issue.
-5. Report the commands used and their actual results.
-6. Do not claim that a build or test passed unless it was run successfully.
-
-## 5. Review
-
-Before opening a pull request:
-
-1. Review the complete diff.
-2. Look for unrelated changes.
-3. Confirm that business logic is not placed in controllers.
-4. Confirm that JSON files are accessed only through repositories.
-5. Check error handling and validation.
-6. Record each finding as fixed or deferred.
-7. If a finding is deferred, explain why.
-
-## 6. Pull request
-
-Prepare a pull request that includes:
-
-- a link to the GitHub issue
-- a summary of the implementation
-- files or layers changed
-- test evidence
-- known limitations
-- any deferred review findings
-
-Show the proposed pull request title and description before creating it.
-Never merge the pull request automatically.
+Summarize the behavior changed, files or layers touched, validation commands and actual results, and any remaining limitation or deferred finding. Never report a command as passing unless it was run successfully.
