@@ -40,8 +40,18 @@
             "access.token.claim": "true",
             "id.token.claim": "false"
           }
+        },
+        {
+          "protocolMapper": "oidc-sub-mapper",
+          "config": {
+            "id.token.claim": "true",
+            "access.token.claim": "true"
+          },
+          "name": "User subject",
+          "protocol": "openid-connect"
         }
-      ]
+      ],
+      "fullScopeAllowed": false
     }
   ],
   "clientScopes": [

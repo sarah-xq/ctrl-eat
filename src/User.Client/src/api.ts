@@ -9,7 +9,7 @@ export class ApiError extends Error {
   }
 }
 
-const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5102").replace(/\/$/, "");
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5103").replace(/\/$/, "");
 
 async function callApi(path: string, user: User, init?: RequestInit): Promise<CalorieGoalResponse> {
   const response = await fetch(`${apiBaseUrl}${path}`, {

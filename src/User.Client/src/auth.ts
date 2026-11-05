@@ -1,6 +1,6 @@
 import { UserManager, WebStorageStateStore } from "oidc-client-ts";
 
-const authority = import.meta.env.VITE_OIDC_AUTHORITY ?? "http://localhost:8080/realms/ctrl-eat";
+const authority = import.meta.env.VITE_OIDC_AUTHORITY ?? "http://localhost:8082/realms/ctrl-eat";
 const clientId = import.meta.env.VITE_OIDC_CLIENT_ID ?? "ctrleat-client";
 
 export const userManager = new UserManager({
@@ -14,5 +14,5 @@ export const userManager = new UserManager({
   loadUserInfo: false,
   automaticSilentRenew: false,
   monitorSession: false,
-  userStore: new WebStorageStateStore({ store: window.localStorage })
+  userStore: new WebStorageStateStore({ store: window.sessionStorage })
 });

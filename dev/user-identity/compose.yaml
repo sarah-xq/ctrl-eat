@@ -3,7 +3,7 @@ services:
     image: quay.io/keycloak/keycloak:26.8.1
     command: ["start-dev", "--import-realm"]
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8082:8080"
     volumes:
       - ./ctrl-eat-realm.json:/opt/keycloak/data/import/ctrl-eat-realm.json:ro
       - identity-data:/opt/keycloak/data

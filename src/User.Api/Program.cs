@@ -18,7 +18,6 @@ public partial class Program
         builder.Services.AddDbContext<UserDbContext>(options =>
             options.UseSqlite(builder.Configuration.GetConnectionString("User")));
         builder.Services.AddScoped<UserProfileRepository>();
-        builder.Services.AddScoped<UserProfileRepository>();
         builder.Services.AddScoped<UserProfileService>();
         builder.Services.AddControllers();
 
