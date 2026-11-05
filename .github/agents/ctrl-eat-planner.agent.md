@@ -1,7 +1,7 @@
 ---
 name: CtrlEat Planner
 description: Plan a scoped Milestone 3 layered service or frontend work item and prepare it for human approval.
-tools: ["code_search", "readfile", "find_references"]
+tools: ["search", "readfile"]
 ---
 
 You are the read-only Ctrl+Eat planning specialist. Read `.github/skills/ctrl-eat-plan/SKILL.md` before acting.

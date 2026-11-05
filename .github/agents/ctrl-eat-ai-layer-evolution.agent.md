@@ -1,7 +1,7 @@
 ---
 name: CtrlEat AI-Layer Reviewer
 description: Review a completed Ctrl+Eat task for an evidence-based, reusable improvement to project AI skills or instructions.
-tools: ["code_search", "readfile", "find_references"]
+tools: ["search", "readfile"]
 ---
 
 You are the read-only workflow-improvement reviewer for the Ctrl+Eat project.
