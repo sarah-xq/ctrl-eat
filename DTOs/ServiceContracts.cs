@@ -10,8 +10,8 @@ namespace CtrlEat.DTOs
     /// </summary>
     public class CreateIngredientRequest
     {
-        public string Name { get; set; }
-        public string FoodGroup { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string FoodGroup { get; set; } = string.Empty;
         public DateTime? ExpiryDate { get; set; }
         public decimal Calories { get; set; }
     }
@@ -22,8 +22,8 @@ namespace CtrlEat.DTOs
     public class IngredientResponse
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string FoodGroup { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string FoodGroup { get; set; } = string.Empty;
         public DateTime? ExpiryDate { get; set; }
         public decimal Calories { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -35,8 +35,8 @@ namespace CtrlEat.DTOs
     public class GetIngredientsRequest
     {
         public int? Id { get; set; }
-        public string Name { get; set; }
-        public string FoodGroup { get; set; }
+        public string? Name { get; set; }
+        public string? FoodGroup { get; set; }
     }
 
 
@@ -49,7 +49,7 @@ namespace CtrlEat.DTOs
     {
         public int IngredientId { get; set; }
         public decimal Quantity { get; set; }
-        public string Unit { get; set; } // e.g., "grams", "cups", "ml"
+        public string Unit { get; set; } = string.Empty; // e.g., "grams", "cups", "ml"
     }
 
     /// <summary>
@@ -57,11 +57,11 @@ namespace CtrlEat.DTOs
     /// </summary>
     public class CreateRecipeRequest
     {
-        public string Name { get; set; }
-        public string Author { get; set; } // Optional
+        public string Name { get; set; } = string.Empty;
+        public string? Author { get; set; } // Optional
         public int TotalTimeMinutes { get; set; }
         public int CookTimeMinutes { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
         public List<RecipeIngredientRequest> Ingredients { get; set; } = new List<RecipeIngredientRequest>();
     }
 
@@ -71,10 +71,10 @@ namespace CtrlEat.DTOs
     public class RecipeIngredientResponse
     {
         public int IngredientId { get; set; }
-        public string IngredientName { get; set; }
-        public string FoodGroup { get; set; }
+        public string IngredientName { get; set; } = string.Empty;
+        public string FoodGroup { get; set; } = string.Empty;
         public decimal Quantity { get; set; }
-        public string Unit { get; set; }
+        public string Unit { get; set; } = string.Empty;
         public decimal CaloriesPerUnit { get; set; }
     }
 
@@ -84,11 +84,11 @@ namespace CtrlEat.DTOs
     public class RecipeResponse
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Author { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string? Author { get; set; }
         public int TotalTimeMinutes { get; set; }
         public int CookTimeMinutes { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
         public decimal TotalCalories { get; set; }
         public List<RecipeIngredientResponse> Ingredients { get; set; } = new List<RecipeIngredientResponse>();
         public DateTime CreatedAt { get; set; }
@@ -100,8 +100,8 @@ namespace CtrlEat.DTOs
     public class GetRecipesRequest
     {
         public int? Id { get; set; }
-        public string Name { get; set; }
-        public string Author { get; set; }
+        public string? Name { get; set; }
+        public string? Author { get; set; }
     }
 
     /// <summary>
@@ -119,8 +119,8 @@ namespace CtrlEat.DTOs
     public class IngredientLookupResponse
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string FoodGroup { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string FoodGroup { get; set; } = string.Empty;
         public decimal Calories { get; set; }
         public DateTime? ExpiryDate { get; set; }
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CtrlEat.Models
 {
@@ -9,8 +9,8 @@ namespace CtrlEat.Models
 	public class Ingredient
 	{
 		public int Id { get; set; }
-		public string Name { get; set; }
-		public string FoodGroup { get; set; }
+		public string Name { get; set; } = string.Empty;
+		public string FoodGroup { get; set; } = string.Empty;
 		public DateTime? ExpiryDate { get; set; }
 		public decimal Calories { get; set; }
 		public DateTime CreatedAt { get; set; }

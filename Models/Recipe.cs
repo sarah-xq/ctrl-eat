@@ -10,11 +10,11 @@ namespace CtrlEat.Models
     public class Recipe
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Author { get; set; } // Optional
+        public string Name { get; set; } = string.Empty;
+        public string? Author { get; set; } // Optional
         public int TotalTimeMinutes { get; set; }
         public int CookTimeMinutes { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
         public decimal TotalCalories { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
@@ -39,9 +39,9 @@ namespace CtrlEat.Models
         public int RecipeId { get; set; }
         public int IngredientId { get; set; }
         public decimal Quantity { get; set; }
-        public string Unit { get; set; } // e.g., "grams", "cups", "ml"
+        public string Unit { get; set; } = string.Empty; // e.g., "grams", "cups", "ml"
 
         // Foreign key navigation
-        public Recipe Recipe { get; set; }
+        public Recipe? Recipe { get; set; }
     }
 }

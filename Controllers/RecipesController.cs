@@ -32,8 +32,8 @@ namespace CtrlEat.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(List<RecipeResponse>), 200)]
         public ActionResult<List<RecipeResponse>> GetRecipes(
-            [FromQuery] string name = null,
-            [FromQuery] string author = null)
+            [FromQuery] string? name = null,
+            [FromQuery] string? author = null)
         {
             try
             {

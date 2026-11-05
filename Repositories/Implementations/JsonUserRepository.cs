@@ -50,14 +50,14 @@ namespace CtrlEat.Repositories.Implementations
             return _fileHelper.ReadData<User>();
         }
 
-        public User GetByEmail(string email)
+        public User? GetByEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email)) return null;
             var list = _fileHelper.ReadData<User>();
             return list.FirstOrDefault(u => string.Equals(u.Email, email, StringComparison.OrdinalIgnoreCase));
         }
 
-        public User GetById(int id)
+        public User? GetById(int id)
         {
             var list = _fileHelper.ReadData<User>();
             return list.FirstOrDefault(u => u.Id == id);
