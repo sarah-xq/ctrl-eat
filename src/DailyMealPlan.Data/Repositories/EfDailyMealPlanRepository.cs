@@ -25,6 +25,7 @@ public sealed class EfDailyMealPlanRepository(DailyMealPlanDbContext dbContext) 
         CancellationToken cancellationToken = default)
     {
         return PlansForOwner(issuer, subject)
+            .AsNoTracking()
             .Include(plan => plan.Snacks)
             .SingleOrDefaultAsync(plan => plan.Id == id, cancellationToken);
     }
