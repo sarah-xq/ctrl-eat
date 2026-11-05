@@ -23,8 +23,7 @@ namespace CtrlEat
                 new JsonIngredientRepository("Data/ingredients.json"));
             builder.Services.AddSingleton<IRecipeRepository>(
                 new JsonRecipeRepository("Data/recipes.json", "Data/recipeIngredients.json"));
-            builder.Services.AddSingleton<IUserRepository>(
-                new JsonUserRepository("Data/users.json"));
+
             builder.Services.AddSingleton<IDailyMealPlanRepository>(
                 new JsonDailyMealPlanRepository("Data/dailyMealPlans.json"));
             builder.Services.AddSingleton<IGroceryListRepository>(
@@ -35,7 +34,7 @@ namespace CtrlEat
             // Register services
             builder.Services.AddSingleton<IngredientService>();
             builder.Services.AddSingleton<RecipeService>();
-            builder.Services.AddSingleton<UserService>();
+
             builder.Services.AddSingleton<DailyMealPlanService>();
             builder.Services.AddSingleton<GroceryListService>();
             builder.Services.AddSingleton<StorageLocationService>();
