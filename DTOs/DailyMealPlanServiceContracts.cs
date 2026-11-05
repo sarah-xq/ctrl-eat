@@ -30,7 +30,7 @@ namespace CtrlEat.DTOs
         public bool IsRecipe { get; set; }
         public int ItemId { get; set; }
         public decimal Quantity { get; set; }
-        public string Unit { get; set; }
+        public string Unit { get; set; } = string.Empty;
     }
 
     public class DailyMealPlanResponse
@@ -50,9 +50,9 @@ namespace CtrlEat.DTOs
     {
         public bool IsRecipe { get; set; }
         public int ItemId { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public decimal Quantity { get; set; }
-        public string Unit { get; set; }
+        public string Unit { get; set; } = string.Empty;
         public decimal Calories { get; set; }
     }
 

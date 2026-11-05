@@ -30,7 +30,7 @@ namespace CtrlEat.Repositories.Implementations
                 if (!File.Exists(_filePath))
                 {
                     var directory = Path.GetDirectoryName(_filePath);
-                    if (!Directory.Exists(directory))
+                    if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                     {
                         Directory.CreateDirectory(directory);
                     }

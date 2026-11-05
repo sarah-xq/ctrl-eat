@@ -45,7 +45,7 @@ namespace CtrlEat.Repositories.Implementations
             }
         }
 
-        public Recipe GetById(int id)
+        public Recipe? GetById(int id)
         {
             var recipes = _recipeFileHelper.ReadData<Recipe>();
             var recipe = recipes.FirstOrDefault(r => r.Id == id);
