@@ -1,32 +1,21 @@
 ---
 name: ctrl-eat-api-feature
-description: Run the complete R-PIV workflow for a feature or bug in the Ctrl+Eat ASP.NET Core API. Use when a request needs research, a reviewed plan, implementation, and validation.
+description: Coordinate research, planning, layered implementation and independent validation for a Ctrl+Eat Milestone 3 feature.
 ---
 
-# Ctrl+Eat API Feature Workflow
+# Ctrl+Eat Milestone 3 R-PIV Workflow
+1. **Research:** Use `ctrl-eat-researcher` and `ctrl-eat-research` to inspect the actual code and required feature.
+2. **Plan:** Use `ctrl-eat-planner` / `ctrl-eat-plan` to produce acceptance criteria, contract decisions, and file-by-file steps. **Stop for human approval.**
+3. **Implement:** Use `domain-dev`, `data-dev`, `api-dev`, `frontend-dev` as needed, normally in that order; `ctrl-eat-implementer` can coordinate a narrowly approved cross-layer step. Each agent has limited layer ownership.
+4. **Validate:** Use `ctrl-eat-validator` / `ctrl-eat-validate` independently. Build/test, review security, and record actual results. Return findings to the responsible developer.
+5. **Peer review:** Have another human inspect the PR, review the human-gate checklist and approve. Do not automate approval, merge or deployment.
+6. **Evolve:** Optionally use `ctrl-eat-ai-layer-evolution` for recurring agent mistakes.
 
-Use this skill as the entry point for a feature or bug that changes the Ctrl+Eat API. **R-PIV means Research, Plan, Implement, Validate.** It coordinates the four focused skills in this folder: `ctrl-eat-research`, `ctrl-eat-plan`, `ctrl-eat-implement`, and `ctrl-eat-validate`.
+The optional `ctrl-eat-dispatcher` only recommends **which agent to use next**. It does not invoke agents automatically.
 
-## Workflow and handoffs
-
-1. **Research:** Inspect the issue and relevant code without editing files. Return the current behavior, constraints, likely files, and unanswered questions. Use `ctrl-eat-research`.
-2. **Plan:** Turn the confirmed requirements and research into a small, ordered plan with acceptance criteria and a validation strategy. Show it to the user and wait for approval before implementation. Use `ctrl-eat-plan`.
-3. **Implement:** Work only from the approved plan, preferably in a fresh context using the plan as the handoff. If implementation reveals a material assumption or scope change, stop and bring it back for a decision. Use `ctrl-eat-implement`.
-4. **Validate:** Compare the completed diff against the plan and run the available build and tests. Prefer a fresh conversation or agent context for this review. Use `ctrl-eat-validate`.
-5. **Evolve:** If the work exposed a repeatable gap in the project’s AI guidance, use `ctrl-eat-ai-layer-evolution` to decide whether a small reusable rule or skill improvement is justified.
-
-Each stage should produce a concise Markdown handoff that can be pasted into or saved for the next stage. Keep the human involved in confirming requirements, approving the plan, and reviewing validation results. Do not automate merges, releases, or deployments.
-
-## Ctrl+Eat project conventions
-
-- Keep HTTP routing and status codes in `Controllers/`.
-- Keep validation, business rules, and orchestration in `Services/`.
-- Access JSON data through `Repositories/`; do not read or write data files directly from controllers or services.
-- Keep API contracts in `DTOs/` and domain types in `Models/`.
-- Follow the patterns of nearby files. The application currently registers JSON-backed repositories and services in `Program.cs`.
-- Do not add a database, framework, package, or architecture layer unless the approved plan requires it.
-- Keep changes tied to the current issue. Do not commit, push, open a pull request, or deploy unless the user explicitly requests that action.
-
-## Completion report
-
-Summarize the behavior changed, files or layers touched, validation commands and actual results, and any remaining limitation or deferred finding. Never report a command as passing unless it was run successfully.
+## Milestone 3 conventions
+- Each service is independently runnable and divided into `.Domain`, `.Data`, `.Api` under `src/`, with corresponding unit and integration tests.
+- Domain is pure business logic; Data uses EF Core; API has thin controllers, DTOs, application services, bearer authentication and scope/claim policies; Client uses REST HTTP only.
+- Existing JSON-backed services are migration sources; do not preserve old persistence constraints when migrating to EF Core.
+- Track work items with clear owners, 3-6 tasks and testable acceptance criteria. Link commits and PRs to work items.
+- Never claim validation or human approval without evidence. No unexpected commits, PRs, merges or deployments.
