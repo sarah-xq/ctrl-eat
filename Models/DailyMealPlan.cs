@@ -44,6 +44,6 @@ namespace CtrlEat.Models
         public bool IsRecipe { get; set; }
         public int ItemId { get; set; } // recipe id or ingredient id
         public decimal Quantity { get; set; }
-        public string Unit { get; set; }
+        public string Unit { get; set; } = string.Empty;
     }
 }

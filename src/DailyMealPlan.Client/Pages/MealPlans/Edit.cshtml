@@ -1,0 +1,65 @@
+@page "{id:int?}"
+@model DailyMealPlan.Client.Pages.MealPlans.EditModel
+@{
+    ViewData["Title"] = Model.IsEditing ? "Edit meal plan" : "Create meal plan";
+}
+
+<header class="page-header">
+    <div>
+        <h1>@ViewData["Title"]</h1>
+    </div>
+    <a asp-page="/MealPlans/Index">Back to plans</a>
+</header>
+
+@if (!string.IsNullOrWhiteSpace(Model.Error))
+{
+    <div class="alert error" role="alert">@Model.Error</div>
+}
+
+<form method="post" class="plan-form">
+    <div asp-validation-summary="All" class="validation-summary" role="alert"></div>
+
+    <label asp-for="Input.Date">Date</label>
+    <input asp-for="Input.Date" type="date" required />
+    <span asp-validation-for="Input.Date"></span>
+
+    <fieldset>
+        <legend>Meals</legend>
+        <label asp-for="Input.BreakfastRecipeId">Breakfast recipe ID</label>
+        <input asp-for="Input.BreakfastRecipeId" type="number" min="1" />
+        <label asp-for="Input.LunchRecipeId">Lunch recipe ID</label>
+        <input asp-for="Input.LunchRecipeId" type="number" min="1" />
+        <label asp-for="Input.DinnerRecipeId">Dinner recipe ID</label>
+        <input asp-for="Input.DinnerRecipeId" type="number" min="1" />
+    </fieldset>
+
+    <fieldset>
+        <legend>Snacks</legend>
+        <div id="snacks" data-snack-list>
+            @for (var index = 0; index < Model.Input.Snacks.Count; index++)
+            {
+                <div class="snack-row" data-snack-row>
+                    <label>
+                        <input asp-for="Input.Snacks[index].IsRecipe" data-snack-field="isRecipe" />
+                        Recipe
+                    </label>
+                    <label>Item ID <input asp-for="Input.Snacks[index].ItemId" data-snack-field="itemId" min="1" /></label>
+                    <label>Quantity <input asp-for="Input.Snacks[index].Quantity" data-snack-field="quantity" min="0.000001" step="any" /></label>
+                    <label>Unit <input asp-for="Input.Snacks[index].Unit" data-snack-field="unit" /></label>
+                    <button type="button" class="danger secondary" data-remove-snack>Remove</button>
+                    <span asp-validation-for="Input.Snacks[index].Quantity"></span>
+                </div>
+            }
+        </div>
+        <button type="button" class="secondary" data-add-snack>Add snack</button>
+    </fieldset>
+
+    <div class="actions">
+        <button type="submit">Save plan</button>
+        <a class="button secondary" asp-page="/MealPlans/Index">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="~/js/meal-plans.js" asp-append-version="true"></script>
+}
