@@ -117,4 +117,50 @@ public sealed class StorageLocationTests
         Assert.Equal(createdAt, location.CreatedAt);
         Assert.Equal(updatedAt, location.UpdatedAt);
     }
+
+    [Fact]
+    public void RehydratePreservesPersistedValuesAndTimestamps()
+    {
+        var createdAt = new DateTime(2025, 1, 2, 3, 4, 5, DateTimeKind.Utc).AddTicks(1234);
+        var updatedAt = new DateTime(2025, 2, 3, 4, 5, 6, DateTimeKind.Utc).AddTicks(5678);
+
+        var location = StorageLocationEntity.Rehydrate(
+            42, "Main fridge", "Cold", 1.25m, 5.75m, [7, 3], createdAt, updatedAt);
+
+        Assert.Equal(42, location.Id);
+        Assert.Equal("Main fridge", location.Name);
+        Assert.Equal("Cold", location.Type);
+        Assert.Equal(1.25m, location.MinimumTemperature);
+        Assert.Equal(5.75m, location.MaximumTemperature);
+        Assert.Equal(new[] { 7, 3 }, location.IngredientIds);
+        Assert.Equal(createdAt, location.CreatedAt);
+        Assert.Equal(updatedAt, location.UpdatedAt);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void RehydrateRejectsNonPositivePersistedIds(int id)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => StorageLocationEntity.Rehydrate(
+            id, "Main fridge", "Cold", 1, 5, [], DateTime.UtcNow, DateTime.UtcNow));
+    }
+
+    [Theory]
+    [InlineData(" ", "Cold", 1, 5, 2)]
+    [InlineData("Main fridge", " ", 1, 5, 2)]
+    [InlineData("  Main fridge  ", "Cold", 1, 5, 2)]
+    [InlineData("Main fridge", "  Cold  ", 1, 5, 2)]
+    [InlineData("Main fridge", "Cold", 5, 4, 2)]
+    [InlineData("Main fridge", "Cold", 1, 5, 0)]
+    public void RehydrateRejectsInvalidPersistedValues(
+        string name,
+        string type,
+        decimal minimumTemperature,
+        decimal maximumTemperature,
+        int ingredientId)
+    {
+        Assert.ThrowsAny<ArgumentException>(() => StorageLocationEntity.Rehydrate(
+            42, name, type, minimumTemperature, maximumTemperature, [ingredientId], DateTime.UtcNow, DateTime.UtcNow));
+    }
 }

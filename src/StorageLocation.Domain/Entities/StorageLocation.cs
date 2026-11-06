@@ -47,6 +47,34 @@ public class StorageLocation
         UpdatedAt = DateTime.UtcNow;
     }
 
+    public static StorageLocation Rehydrate(
+        int id,
+        string? name,
+        string? type,
+        decimal minimumTemperature,
+        decimal maximumTemperature,
+        IEnumerable<int>? ingredientIds,
+        DateTime createdAt,
+        DateTime updatedAt)
+    {
+        if (id <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(id), id, "Persisted storage location IDs must be greater than zero.");
+        }
+
+        var location = new StorageLocation(name, type, minimumTemperature, maximumTemperature, ingredientIds);
+        if (!string.Equals(location.Name, name, StringComparison.Ordinal)
+            || !string.Equals(location.Type, type, StringComparison.Ordinal))
+        {
+            throw new ArgumentException("Persisted storage location names and types must already be trimmed.");
+        }
+
+        location.Id = id;
+        location.CreatedAt = createdAt;
+        location.UpdatedAt = updatedAt;
+        return location;
+    }
+
     private static (string Name, string Type, List<int> IngredientIds) ValidateAndNormalize(
         string? name,
         string? type,
