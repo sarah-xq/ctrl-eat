@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.DataProtection;
 using DailyMealPlan.Client.Api;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -15,6 +16,8 @@ builder.Services.AddHttpClient<DailyMealPlanApiClient>(client =>
     client.BaseAddress = new Uri(apiUrl.TrimEnd('/') + "/");
 });
 builder.Services.AddHttpContextAccessor();
+if (builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Demo:EphemeralSessions"))
+    builder.Services.AddDataProtection().UseEphemeralDataProtectionProvider();
 
 builder.Services.AddRazorPages(options =>
 {
@@ -67,7 +70,6 @@ builder.Services.AddAuthentication(options =>
     };
     options.Scope.Clear();
     options.Scope.Add("openid");
-    options.Scope.Add("profile");
     options.Scope.Add("daily-meal-plans.read");
     options.Scope.Add("daily-meal-plans.write");
 });
