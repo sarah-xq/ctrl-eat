@@ -160,6 +160,60 @@ public sealed class StorageLocationsApiTests
         Assert.Empty(locations!);
     }
 
+    [Fact]
+    public async Task DevelopmentHttpTransportProvidesIngredientDetailsForCreateAndRead()
+    {
+        using var host = CreateHost(environment: "Development", useConfiguredIngredientClient: true);
+
+        using var createResponse = await host.Client.PostAsJsonAsync(
+            "/api/StorageLocations", Request("Development fridge", "Cold", ingredientIds: [7]));
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+        var created = await ReadResponseAsync(createResponse);
+        var createdIngredient = Assert.Single(created.Ingredients);
+        Assert.Equal(7, createdIngredient.Id);
+        Assert.Equal("Milk", createdIngredient.Name);
+        Assert.Equal("Dairy", createdIngredient.FoodGroup);
+        Assert.Equal(61, createdIngredient.Calories);
+
+        using var getResponse = await host.Client.GetAsync($"/api/StorageLocations/{created.Id}");
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+        var fetched = await ReadResponseAsync(getResponse);
+        Assert.Equal(createdIngredient, Assert.Single(fetched.Ingredients));
+    }
+
+    [Fact]
+    public async Task ProductionEnvironmentDoesNotRegisterDevelopmentIngredientTransport()
+    {
+        using var host = CreateHost(environment: "Production", useConfiguredIngredientClient: true);
+        using var response = await host.Client.PostAsJsonAsync(
+            "/api/StorageLocations", Request("Production fridge", "Cold", ingredientIds: [7]));
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task DevelopmentTransportSimulatesUpstreamErrorsAndMissingIngredients()
+    {
+        using var host = CreateHost(environment: "Development", useConfiguredIngredientClient: true);
+
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await host.Client.PostAsJsonAsync(
+                "/api/StorageLocations", Request("Missing ingredient", "Cold", ingredientIds: [999]))).StatusCode);
+        Assert.Equal(HttpStatusCode.BadGateway,
+            (await host.Client.PostAsJsonAsync(
+                "/api/StorageLocations", Request("Unauthorized upstream", "Cold", ingredientIds: [401]))).StatusCode);
+        Assert.Equal(HttpStatusCode.BadGateway,
+            (await host.Client.PostAsJsonAsync(
+                "/api/StorageLocations", Request("Forbidden upstream", "Cold", ingredientIds: [403]))).StatusCode);
+        Assert.Equal(HttpStatusCode.ServiceUnavailable,
+            (await host.Client.PostAsJsonAsync(
+                "/api/StorageLocations", Request("Unavailable upstream", "Cold", ingredientIds: [500]))).StatusCode);
+
+        using var listResponse = await host.Client.GetAsync("/api/StorageLocations");
+        var locations = await listResponse.Content.ReadFromJsonAsync<List<StorageLocationResponse>>();
+        Assert.Empty(locations!);
+    }
+
     private static async Task AssertIngredientDependencyFailureDoesNotPersistAsync(IIngredientClient ingredientClient)
     {
         using var host = CreateHost(ingredientClient);
@@ -210,17 +264,32 @@ public sealed class StorageLocationsApiTests
         return Assert.IsType<StorageLocationResponse>(result);
     }
 
-    private static TestHost CreateHost(IIngredientClient? customIngredientClient = null, bool registerIngredientClient = true)
+    private static TestHost CreateHost(
+        IIngredientClient? customIngredientClient = null,
+        bool registerIngredientClient = true,
+        string environment = "Testing",
+        bool useConfiguredIngredientClient = false)
     {
         var databasePath = Path.Combine(Path.GetTempPath(), $"storage-location-api-{Guid.NewGuid():N}.db");
         var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
+            builder.UseEnvironment(environment);
             builder.UseSetting("ConnectionStrings:StorageLocation", $"Data Source={databasePath};Pooling=False");
-            if (registerIngredientClient)
+            builder.UseSetting("IngredientApi:BaseUrl", "http://ingredient.test/");
+            builder.ConfigureTestServices(services =>
             {
-                builder.ConfigureTestServices(services =>
+                if (!useConfiguredIngredientClient)
                 {
                     services.RemoveAll<IIngredientClient>();
+                }
+
+                if (registerIngredientClient)
+                {
+                    if (useConfiguredIngredientClient)
+                    {
+                        return;
+                    }
+
                     if (customIngredientClient is null)
                     {
                         services.AddSingleton<IIngredientClient, TestIngredientClient>();
@@ -229,8 +298,8 @@ public sealed class StorageLocationsApiTests
                     {
                         services.AddSingleton(customIngredientClient);
                     }
-                });
-            }
+                }
+            });
         });
 
         return new TestHost(factory, databasePath);

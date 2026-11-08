@@ -31,6 +31,10 @@ public sealed class StorageLocationsController(StorageLocationService service) :
         {
             return StatusCode(StatusCodes.Status502BadGateway, new { error = exception.Message });
         }
+        catch (IngredientUpstreamAuthorizationException exception)
+        {
+            return StatusCode(StatusCodes.Status502BadGateway, new { error = exception.Message });
+        }
     }
 
     [HttpGet("{id:int}")]
@@ -50,6 +54,10 @@ public sealed class StorageLocationsController(StorageLocationService service) :
             return StatusCode(StatusCodes.Status503ServiceUnavailable, new { error = exception.Message });
         }
         catch (IngredientNotFoundException exception)
+        {
+            return StatusCode(StatusCodes.Status502BadGateway, new { error = exception.Message });
+        }
+        catch (IngredientUpstreamAuthorizationException exception)
         {
             return StatusCode(StatusCodes.Status502BadGateway, new { error = exception.Message });
         }
@@ -83,6 +91,10 @@ public sealed class StorageLocationsController(StorageLocationService service) :
         catch (IngredientLookupUnavailableException exception)
         {
             return StatusCode(StatusCodes.Status503ServiceUnavailable, new { error = exception.Message });
+        }
+        catch (IngredientUpstreamAuthorizationException exception)
+        {
+            return StatusCode(StatusCodes.Status502BadGateway, new { error = exception.Message });
         }
     }
 
@@ -118,6 +130,10 @@ public sealed class StorageLocationsController(StorageLocationService service) :
         catch (IngredientLookupUnavailableException exception)
         {
             return StatusCode(StatusCodes.Status503ServiceUnavailable, new { error = exception.Message });
+        }
+        catch (IngredientUpstreamAuthorizationException exception)
+        {
+            return StatusCode(StatusCodes.Status502BadGateway, new { error = exception.Message });
         }
     }
 
