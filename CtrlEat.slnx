@@ -1,12 +1,14 @@
 <Solution>
   <Project Path="CtrlEat.csproj" />
   <Project Path="CtrlEat.Tests/CtrlEat.Tests.csproj" />
+  <Project Path="src/StorageLocation.Api/StorageLocation.Api.csproj" />
   <Project Path="src/StorageLocation.Data/StorageLocation.Data.csproj" />
   <Project Path="src/StorageLocation.Domain/StorageLocation.Domain.csproj" />
   <Project Path="src/User.Api/User.Api.csproj" />
   <Project Path="src/User.Data/User.Data.csproj" />
   <Project Path="src/User.Domain/User.Domain.csproj" />
   <Project Path="tests/User.IntegrationTests/User.IntegrationTests.csproj" />
+  <Project Path="tests/StorageLocation.ApiTests/StorageLocation.ApiTests.csproj" />
   <Project Path="tests/StorageLocation.DataTests/StorageLocation.DataTests.csproj" />
   <Project Path="tests/StorageLocation.UnitTests/StorageLocation.UnitTests.csproj" />
   <Project Path="tests/User.UnitTests/User.UnitTests.csproj" />
