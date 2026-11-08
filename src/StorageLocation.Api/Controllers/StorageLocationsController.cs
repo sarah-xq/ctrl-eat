@@ -9,10 +9,10 @@ namespace StorageLocation.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-[AllowAnonymous]
 public sealed class StorageLocationsController(StorageLocationService service) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Policy = "storage-locations.read")]
     [ProducesResponseType(typeof(IReadOnlyList<StorageLocationResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<StorageLocationResponse>>> GetStorageLocations(
         [FromQuery] string? name,
@@ -38,6 +38,7 @@ public sealed class StorageLocationsController(StorageLocationService service) :
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Policy = "storage-locations.read")]
     [ProducesResponseType(typeof(StorageLocationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<StorageLocationResponse>> GetStorageLocation(
@@ -64,6 +65,7 @@ public sealed class StorageLocationsController(StorageLocationService service) :
     }
 
     [HttpPost]
+    [Authorize(Policy = "storage-locations.write")]
     [ProducesResponseType(typeof(StorageLocationResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<StorageLocationResponse>> CreateStorageLocation(
@@ -99,6 +101,7 @@ public sealed class StorageLocationsController(StorageLocationService service) :
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = "storage-locations.write")]
     [ProducesResponseType(typeof(StorageLocationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -138,6 +141,7 @@ public sealed class StorageLocationsController(StorageLocationService service) :
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = "storage-locations.write")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteStorageLocation([FromRoute] int id, CancellationToken cancellationToken)

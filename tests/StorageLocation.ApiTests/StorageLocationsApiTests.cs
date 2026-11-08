@@ -1,11 +1,19 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using StorageLocation.Api.Clients;
 using StorageLocation.Api.DTOs;
 
@@ -13,6 +21,9 @@ namespace StorageLocation.ApiTests;
 
 public sealed class StorageLocationsApiTests
 {
+    private const string TestIssuer = "https://storage-issuer.test";
+    private const string TestAudience = "storage-api-tests";
+
     [Fact]
     public async Task CreateGetUpdateAndDeleteUseTheAgreedRoutesAndResponses()
     {
@@ -161,6 +172,52 @@ public sealed class StorageLocationsApiTests
     }
 
     [Fact]
+    public async Task ProtectedRoutesRejectMissingInvalidExpiredAndWrongAudienceTokensButHealthIsPublic()
+    {
+        using var key = RSA.Create(2048);
+        using var host = CreateHost(signingKey: key);
+        using var client = host.Client;
+
+        client.DefaultRequestHeaders.Authorization = null;
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/health")).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/StorageLocations")).StatusCode);
+
+        foreach (var token in new[]
+        {
+            "not-a-jwt",
+            CreateToken(key, scope: "storage-locations.read", expired: true),
+            CreateToken(key, scope: "storage-locations.read", audience: "wrong-audience")
+        })
+        {
+            SetToken(client, token);
+            Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/StorageLocations")).StatusCode);
+        }
+    }
+
+    [Fact]
+    public async Task ReadAndWritePoliciesRequireTheirOwnScopes()
+    {
+        using var key = RSA.Create(2048);
+        using var host = CreateHost(signingKey: key);
+        using var client = host.Client;
+
+        SetToken(client, CreateToken(key, scope: "storage-locations.read"));
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/StorageLocations")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden,
+            (await client.PostAsJsonAsync("/api/StorageLocations", Request("Pantry", "Dry"))).StatusCode);
+
+        SetToken(client, CreateToken(key, scope: "storage-locations.write"));
+        Assert.Equal(HttpStatusCode.Forbidden, (await client.GetAsync("/api/StorageLocations")).StatusCode);
+        using var created = await client.PostAsJsonAsync("/api/StorageLocations", Request("Pantry", "Dry"));
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        var storageLocation = await ReadResponseAsync(created);
+        Assert.Equal(HttpStatusCode.OK, (await client.PutAsJsonAsync(
+            $"/api/StorageLocations/{storageLocation.Id}", Request("Updated pantry", "Dry"))).StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, (await client.DeleteAsync(
+            $"/api/StorageLocations/{storageLocation.Id}")).StatusCode);
+    }
+
+    [Fact]
     public async Task DevelopmentHttpTransportProvidesIngredientDetailsForCreateAndRead()
     {
         using var host = CreateHost(environment: "Development", useConfiguredIngredientClient: true);
@@ -268,28 +325,27 @@ public sealed class StorageLocationsApiTests
         IIngredientClient? customIngredientClient = null,
         bool registerIngredientClient = true,
         string environment = "Testing",
-        bool useConfiguredIngredientClient = false)
+        bool useConfiguredIngredientClient = false,
+        RSA? signingKey = null)
     {
         var databasePath = Path.Combine(Path.GetTempPath(), $"storage-location-api-{Guid.NewGuid():N}.db");
+        signingKey ??= RSA.Create(2048);
         var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment(environment);
             builder.UseSetting("ConnectionStrings:StorageLocation", $"Data Source={databasePath};Pooling=False");
             builder.UseSetting("IngredientApi:BaseUrl", "http://ingredient.test/");
+            builder.UseSetting("Authentication:Authority", TestIssuer);
+            builder.UseSetting("Authentication:Audience", TestAudience);
             builder.ConfigureTestServices(services =>
             {
-                if (!useConfiguredIngredientClient)
+                if (!registerIngredientClient || !useConfiguredIngredientClient)
                 {
                     services.RemoveAll<IIngredientClient>();
                 }
 
-                if (registerIngredientClient)
+                if (registerIngredientClient && !useConfiguredIngredientClient)
                 {
-                    if (useConfiguredIngredientClient)
-                    {
-                        return;
-                    }
-
                     if (customIngredientClient is null)
                     {
                         services.AddSingleton<IIngredientClient, TestIngredientClient>();
@@ -299,20 +355,65 @@ public sealed class StorageLocationsApiTests
                         services.AddSingleton(customIngredientClient);
                     }
                 }
+
+                if (signingKey is not null)
+                {
+                    services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+                    {
+                        var discovery = new OpenIdConnectConfiguration { Issuer = TestIssuer };
+                        discovery.SigningKeys.Add(new RsaSecurityKey(signingKey) { KeyId = "storage-test" });
+                        options.ConfigurationManager = new StaticConfigurationManager<OpenIdConnectConfiguration>(discovery);
+                    });
+                }
             });
         });
 
-        return new TestHost(factory, databasePath);
+        return new TestHost(factory, databasePath, signingKey);
     }
 
-    private sealed class TestHost(WebApplicationFactory<Program> factory, string databasePath) : IDisposable
+    private static void SetToken(HttpClient client, string token) =>
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+    private static string CreateToken(
+        RSA signingKey,
+        string scope,
+        string issuer = TestIssuer,
+        string audience = TestAudience,
+        bool expired = false)
     {
-        public HttpClient Client { get; } = factory.CreateClient();
+        var now = DateTime.UtcNow;
+        var credentials = new SigningCredentials(new RsaSecurityKey(signingKey) { KeyId = "storage-test" }, SecurityAlgorithms.RsaSha256);
+        var token = new JwtSecurityToken(
+            issuer,
+            audience,
+            [new Claim("sub", "storage-test-user"), new Claim("scope", scope)],
+            now.AddMinutes(-2),
+            expired ? now.AddMinutes(-1) : now.AddMinutes(10),
+            credentials);
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    private sealed class TestHost : IDisposable
+    {
+        private readonly WebApplicationFactory<Program> factory;
+        private readonly string databasePath;
+        private readonly RSA signingKey;
+        public HttpClient Client { get; }
+
+        public TestHost(WebApplicationFactory<Program> factory, string databasePath, RSA signingKey)
+        {
+            this.factory = factory;
+            this.databasePath = databasePath;
+            this.signingKey = signingKey;
+            Client = factory.CreateClient();
+            SetToken(Client, CreateToken(signingKey, "storage-locations.read storage-locations.write"));
+        }
 
         public void Dispose()
         {
             Client.Dispose();
             factory.Dispose();
+            signingKey.Dispose();
             SqliteConnection.ClearAllPools();
             foreach (var suffix in new[] { string.Empty, "-shm", "-wal" })
             {
