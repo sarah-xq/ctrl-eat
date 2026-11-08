@@ -1,0 +1,6 @@
+@page "{id:int}"
+@model CtrlEat.RazorClient.Pages.StorageLocations.EditModel
+@{ ViewData["Title"] = "Edit Storage Location"; }
+<h1>Edit Storage Location</h1>
+@if (Model.ErrorMessage is not null) { <div class="alert" role="alert">@Model.ErrorMessage</div> }
+@if (!Model.Loaded) { <p>Storage location could not be loaded.</p> } else { <form method="post" class="form"><partial name="_Form" model="Model" /></form> }

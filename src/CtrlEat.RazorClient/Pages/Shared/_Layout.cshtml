@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Ctrl Eat</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" asp-page="/Index">Ctrl Eat</a>
+        <nav aria-label="Main navigation">
+            <a asp-page="/StorageLocations/Index">Storage Locations</a>
+            <a asp-page="/Placeholder" asp-route-areaName="Grocery Lists">Grocery Lists</a>
+            <a asp-page="/Placeholder" asp-route-areaName="Users">Users</a>
+            <a asp-page="/Placeholder" asp-route-areaName="Daily Meal Plans">Daily Meal Plans</a>
+            <a asp-page="/Placeholder" asp-route-areaName="Ingredients">Ingredients</a>
+            <a asp-page="/Placeholder" asp-route-areaName="Recipes">Recipes</a>
+        </nav>
+        @if (User.Identity?.IsAuthenticated == true) { <a href="/logout">Sign out</a> }
+    </header>
+    <main class="container">@RenderBody()</main>
+    <footer class="container"><small>Ctrl Eat Milestone 3</small></footer>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

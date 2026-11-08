@@ -4,10 +4,12 @@
   <Project Path="src/StorageLocation.Api/StorageLocation.Api.csproj" />
   <Project Path="src/StorageLocation.Data/StorageLocation.Data.csproj" />
   <Project Path="src/StorageLocation.Domain/StorageLocation.Domain.csproj" />
+  <Project Path="src/CtrlEat.RazorClient/CtrlEat.RazorClient.csproj" />
   <Project Path="src/User.Api/User.Api.csproj" />
   <Project Path="src/User.Data/User.Data.csproj" />
   <Project Path="src/User.Domain/User.Domain.csproj" />
   <Project Path="tests/User.IntegrationTests/User.IntegrationTests.csproj" />
+  <Project Path="tests/CtrlEat.RazorClient.Tests/CtrlEat.RazorClient.Tests.csproj" />
   <Project Path="tests/StorageLocation.ApiTests/StorageLocation.ApiTests.csproj" />
   <Project Path="tests/StorageLocation.DataTests/StorageLocation.DataTests.csproj" />
   <Project Path="tests/StorageLocation.UnitTests/StorageLocation.UnitTests.csproj" />

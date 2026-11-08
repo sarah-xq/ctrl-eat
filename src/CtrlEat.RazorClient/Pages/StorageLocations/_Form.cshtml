@@ -1,0 +1,8 @@
+@model CtrlEat.RazorClient.Pages.StorageLocations.FormModel
+<div asp-validation-summary="ModelOnly" class="alert"></div>
+<label asp-for="Input.Name"></label><input asp-for="Input.Name" /><span asp-validation-for="Input.Name"></span>
+<label asp-for="Input.Type"></label><input asp-for="Input.Type" /><span asp-validation-for="Input.Type"></span>
+<label asp-for="Input.MinimumTemperature"></label><input asp-for="Input.MinimumTemperature" step="0.01" /><span asp-validation-for="Input.MinimumTemperature"></span>
+<label asp-for="Input.MaximumTemperature"></label><input asp-for="Input.MaximumTemperature" step="0.01" /><span asp-validation-for="Input.MaximumTemperature"></span>
+<label asp-for="IngredientIdsText">Ingredient IDs (comma-separated)</label><input asp-for="IngredientIdsText" placeholder="1, 2, 3" /><span asp-validation-for="IngredientIdsText"></span>
+<button type="submit">@Model.SubmitLabel</button> <a class="button secondary" asp-page="Index">Cancel</a>

@@ -1,0 +1,6 @@
+@page
+@model CtrlEat.RazorClient.Pages.StorageLocations.CreateModel
+@{ ViewData["Title"] = "Add Storage Location"; }
+<h1>Add Storage Location</h1>
+@if (Model.ErrorMessage is not null) { <div class="alert" role="alert">@Model.ErrorMessage</div> }
+<form method="post" class="form"><partial name="_Form" model="Model" /></form>
