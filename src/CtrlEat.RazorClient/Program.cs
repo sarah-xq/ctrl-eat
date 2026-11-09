@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/StorageLocations");
+    options.Conventions.AuthorizeFolder("/GroceryLists");
 });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient("StorageLocationApi", client =>
@@ -25,6 +26,20 @@ builder.Services.AddHttpClient("StorageLocationApi", client =>
     client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
 });
 builder.Services.AddScoped<StorageLocationApiClient>();
+builder.Services.AddHttpClient("GroceryListApi", client =>
+{
+    var baseUrl = builder.Configuration["GroceryListApi:BaseUrl"]
+        ?? throw new InvalidOperationException("GroceryListApi:BaseUrl is required.");
+    if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out var apiUri)
+        || apiUri.Scheme is not ("http" or "https")
+        || (!builder.Environment.IsDevelopment() && !builder.Environment.IsEnvironment("Testing") && apiUri.Scheme != Uri.UriSchemeHttps))
+    {
+        throw new InvalidOperationException("GroceryListApi:BaseUrl must be an HTTPS URL outside Development and Testing.");
+    }
+    client.BaseAddress = apiUri;
+    client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+});
+builder.Services.AddScoped<GroceryListApiClient>();
 
 var authority = builder.Configuration["Authentication:Authority"]
     ?? throw new InvalidOperationException("Authentication:Authority is required.");
@@ -55,7 +70,7 @@ builder.Services.AddAuthentication(options =>
     options.RequireHttpsMetadata = builder.Configuration.GetValue("Authentication:RequireHttpsMetadata", true);
     options.Scope.Clear();
     foreach (var scope in (builder.Configuration["Authentication:Scopes"]
-        ?? "openid profile storage-locations.read storage-locations.write").Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        ?? "openid profile storage-locations.read storage-locations.write grocery-lists.read grocery-lists.write").Split(' ', StringSplitOptions.RemoveEmptyEntries))
     {
         options.Scope.Add(scope);
     }

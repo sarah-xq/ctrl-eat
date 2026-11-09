@@ -1,0 +1,16 @@
+@page "{id:int}"
+@model CtrlEat.RazorClient.Pages.GroceryLists.DetailsModel
+@{
+    ViewData["Title"] = "Grocery List Details";
+}
+@if (Model.ErrorMessage is not null) { <div class="alert" role="alert">@Model.ErrorMessage</div> }
+@if (Model.GroceryList is not null) {
+    <h1>Grocery List for @Model.GroceryList.Date.ToString("yyyy-MM-dd")</h1>
+    <dl><dt>Created</dt><dd>@Model.GroceryList.CreatedAt</dd></dl>
+    <h2>Ingredients</h2>
+    @if (Model.GroceryList.Ingredients.Count == 0) { <p>No ingredients in this list.</p> }
+    else { <ul>@foreach (var ingredient in Model.GroceryList.Ingredients) { <li>@ingredient.Name (@ingredient.FoodGroup), @ingredient.Calories calories</li> }</ul> }
+    <a class="button" asp-page="Edit" asp-route-id="@Model.GroceryList.Id">Edit</a>
+    <a class="button secondary" asp-page="Delete" asp-route-id="@Model.GroceryList.Id">Delete</a>
+}
+<a asp-page="Index">Back to Grocery Lists</a>

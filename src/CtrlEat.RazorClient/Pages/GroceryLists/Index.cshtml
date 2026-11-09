@@ -1,0 +1,19 @@
+@page
+@model CtrlEat.RazorClient.Pages.GroceryLists.IndexModel
+@{
+    ViewData["Title"] = "Grocery Lists";
+}
+<div class="page-heading"><div><h1>Grocery Lists</h1><p>Plan ingredients for a date.</p></div><a class="button" asp-page="Create">Create grocery list</a></div>
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage)) { <div class="alert" role="alert">@Model.ErrorMessage</div> }
+<form method="get" class="filters">
+    <label asp-for="Date">Date <input asp-for="Date" type="date" /></label>
+    <button type="submit">Filter</button>
+    <a class="button secondary" asp-page="Index">Clear</a>
+</form>
+@if (Model.GroceryLists is null) { <p>Grocery lists could not be loaded.</p> }
+else if (Model.GroceryLists.Count == 0) { <p>No grocery lists found.</p> }
+else {
+    <table><thead><tr><th>Date</th><th>Ingredients</th><th>Actions</th></tr></thead><tbody>
+    @foreach (var list in Model.GroceryLists) { <tr><td>@list.Date.ToString("yyyy-MM-dd")</td><td>@list.Ingredients.Count</td><td><a asp-page="Details" asp-route-id="@list.Id">Details</a> | <a asp-page="Edit" asp-route-id="@list.Id">Edit</a> | <a asp-page="Delete" asp-route-id="@list.Id">Delete</a></td></tr> }
+    </tbody></table>
+}
