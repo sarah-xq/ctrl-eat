@@ -1,0 +1,19 @@
+@page
+@model CtrlEat.RazorClient.Pages.StorageLocations.IndexModel
+@{
+    ViewData["Title"] = "Storage Locations";
+}
+<div class="page-heading"><div><h1>Storage Locations</h1><p>Search and manage food storage.</p></div><a class="button" asp-page="Create">Add location</a></div>
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage)) { <div class="alert" role="alert">@Model.ErrorMessage</div> }
+<form method="get" class="filters">
+    <label>Name <input asp-for="Name" /></label>
+    <label>Type <input asp-for="Type" /></label>
+    <button type="submit">Search</button>
+</form>
+@if (Model.Locations is null) { <p aria-busy="true">Loading storage locations…</p> }
+else if (Model.Locations.Count == 0) { <p>No storage locations found.</p> }
+else {
+<table><thead><tr><th>Name</th><th>Type</th><th>Temperature</th><th>Ingredients</th><th>Actions</th></tr></thead><tbody>
+@foreach (var location in Model.Locations) { <tr><td>@location.Name</td><td>@location.Type</td><td>@location.MinimumTemperature–@location.MaximumTemperature°</td><td>@location.Ingredients.Count</td><td><a asp-page="Details" asp-route-id="@location.Id">Details</a> | <a asp-page="Edit" asp-route-id="@location.Id">Edit</a> | <a asp-page="Delete" asp-route-id="@location.Id">Delete</a></td></tr> }
+</tbody></table>
+}

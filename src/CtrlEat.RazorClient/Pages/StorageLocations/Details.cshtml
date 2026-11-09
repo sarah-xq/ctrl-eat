@@ -1,0 +1,6 @@
+@page "{id:int}"
+@model CtrlEat.RazorClient.Pages.StorageLocations.DetailsModel
+@{ ViewData["Title"] = "Storage Location Details"; }
+@if (Model.ErrorMessage is not null) { <div class="alert" role="alert">@Model.ErrorMessage</div> }
+@if (Model.Location is not null) { <h1>@Model.Location.Name</h1><dl><dt>Type</dt><dd>@Model.Location.Type</dd><dt>Temperature range</dt><dd>@Model.Location.MinimumTemperature–@Model.Location.MaximumTemperature°</dd><dt>Created</dt><dd>@Model.Location.CreatedAt</dd></dl><h2>Stored ingredients</h2>@if (Model.Location.Ingredients.Count == 0) { <p>No ingredients stored.</p> } else { <ul>@foreach (var ingredient in Model.Location.Ingredients) { <li>@ingredient.Name (@ingredient.FoodGroup), @ingredient.Calories calories</li> }</ul> }<a class="button" asp-page="Edit" asp-route-id="@Model.Location.Id">Edit</a> }
+<a asp-page="Index">Back to list</a>

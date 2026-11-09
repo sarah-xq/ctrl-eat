@@ -1,0 +1,12 @@
+@page "{id:int}"
+@model CtrlEat.RazorClient.Pages.GroceryLists.DeleteModel
+@{
+    ViewData["Title"] = "Delete Grocery List";
+}
+<h1>Delete Grocery List</h1>
+@if (Model.ErrorMessage is not null) { <div class="alert" role="alert">@Model.ErrorMessage</div> }
+@if (Model.GroceryList is not null) {
+    <p>Are you sure you want to delete the grocery list for <strong>@Model.GroceryList.Date.ToString("yyyy-MM-dd")</strong> containing @Model.GroceryList.Ingredients.Count ingredient(s)?</p>
+    <form method="post"><button class="danger" type="submit">Delete</button> <a class="button secondary" asp-page="Details" asp-route-id="@Model.Id">Cancel</a></form>
+}
+<a asp-page="Index">Back to Grocery Lists</a>
