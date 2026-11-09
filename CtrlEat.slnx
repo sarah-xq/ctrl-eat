@@ -1,6 +1,9 @@
 <Solution>
-  <Folder Name="/src/" />
+  <Folder Name="/src/">
+    <Project Path="src/GroceryList.Data/GroceryList.Data.csproj" />
+  </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/GroceryList.DataTests/GroceryList.DataTests.csproj" />
     <Project Path="tests/GroceryList.UnitTests/GroceryList.UnitTests.csproj" />
   </Folder>
   <Project Path="CtrlEat.csproj" />
