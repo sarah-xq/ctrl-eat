@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using GroceryList.Data;
@@ -179,17 +180,48 @@ public sealed class GroceryListsApiTests
         Assert.Equal(0, ingredientClient.CallCount);
     }
 
+    [Fact]
+    public async Task TestingEnvironmentUsesDevelopmentIngredientTransport()
+    {
+        using var host = CreateHost();
+
+        using var response = await host.Client.PostAsJsonAsync(
+            "/api/GroceryLists", Request(new DateTime(2026, 11, 12), [1]));
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task ProductionEnvironmentUsesRealTransportInsteadOfDevelopmentFake()
+    {
+        using var host = CreateHost(environment: "Production", ingredientApiBaseUrl: "http://127.0.0.1:1/");
+
+        using var response = await host.Client.PostAsJsonAsync(
+            "/api/GroceryLists", Request(new DateTime(2026, 11, 12), [1]));
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+    }
+
     private static object Request(DateTime date, int[]? ingredientIds = null) => new
     {
         IngredientIds = ingredientIds,
         Date = date
     };
 
-    private static TestHost CreateHost(FakeIngredientClient? ingredientClient = null)
+    private static TestHost CreateHost(
+        FakeIngredientClient? ingredientClient = null,
+        string environment = "Testing",
+        string? ingredientApiBaseUrl = null)
     {
         var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
-            builder.UseEnvironment("Testing");
+            builder.UseEnvironment(environment);
+            if (ingredientApiBaseUrl is not null)
+            {
+                builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(
+                    new Dictionary<string, string?> { ["IngredientApi:BaseUrl"] = ingredientApiBaseUrl }));
+            }
+
             builder.ConfigureTestServices(services =>
             {
                 services.RemoveAll<DbContextOptions<GroceryListDbContext>>();
@@ -199,8 +231,11 @@ public sealed class GroceryListsApiTests
                 services.AddSingleton(connection);
                 services.AddDbContext<GroceryListDbContext>((provider, options) =>
                     options.UseSqlite(provider.GetRequiredService<SqliteConnection>()));
-                services.RemoveAll<IIngredientClient>();
-                services.AddSingleton<IIngredientClient>(ingredientClient ?? new FakeIngredientClient());
+                if (ingredientClient is not null)
+                {
+                    services.RemoveAll<IIngredientClient>();
+                    services.AddSingleton<IIngredientClient>(ingredientClient);
+                }
             });
         });
         return new TestHost(factory, ingredientClient);
