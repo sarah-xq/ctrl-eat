@@ -7,5 +7,6 @@
   <ItemGroup>
 	<ProjectReference Include="../GroceryList.Domain/GroceryList.Domain.csproj" />
 	<ProjectReference Include="../GroceryList.Data/GroceryList.Data.csproj" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.14" />
   </ItemGroup>
 </Project>

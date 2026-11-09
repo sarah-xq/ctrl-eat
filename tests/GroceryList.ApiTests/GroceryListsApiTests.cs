@@ -1,5 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using GroceryList.Api.Clients;
 using GroceryList.Api.DTOs;
 using Microsoft.AspNetCore.Hosting;
@@ -10,12 +15,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using GroceryList.Data;
 
 namespace GroceryList.ApiTests;
 
 public sealed class GroceryListsApiTests
 {
+    private const string TestIssuer = "https://grocery-issuer.test";
+    private const string TestAudience = "grocery-api-tests";
+
     [Fact]
     public async Task CreateGetUpdateAndDeleteUseTheAgreedRoutesAndResponseFields()
     {
@@ -143,6 +154,91 @@ public sealed class GroceryListsApiTests
     }
 
     [Fact]
+    public async Task MissingAndInvalidTokensReturnUnauthorized()
+    {
+        using var host = CreateHost();
+        host.Client.DefaultRequestHeaders.Authorization = null;
+
+        Assert.Equal(HttpStatusCode.Unauthorized, (await host.Client.GetAsync("/api/GroceryLists")).StatusCode);
+
+        host.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "not-a-jwt");
+        Assert.Equal(HttpStatusCode.Unauthorized, (await host.Client.GetAsync("/api/GroceryLists")).StatusCode);
+    }
+
+    [Fact]
+    public async Task ExpiredWrongIssuerAndWrongAudienceTokensReturnUnauthorized()
+    {
+        using var host = CreateHost();
+
+        host.SetToken("grocery-lists.read", expired: true);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await host.Client.GetAsync("/api/GroceryLists")).StatusCode);
+
+        host.SetToken("grocery-lists.read", issuer: "https://wrong-issuer.test");
+        Assert.Equal(HttpStatusCode.Unauthorized, (await host.Client.GetAsync("/api/GroceryLists")).StatusCode);
+
+        host.SetToken("grocery-lists.read", audience: "wrong-audience");
+        Assert.Equal(HttpStatusCode.Unauthorized, (await host.Client.GetAsync("/api/GroceryLists")).StatusCode);
+    }
+
+    [Fact]
+    public async Task ValidTokenWithoutRequiredScopeReturnsForbidden()
+    {
+        using var host = CreateHost();
+        host.SetToken("profile.read");
+
+        Assert.Equal(HttpStatusCode.Forbidden, (await host.Client.GetAsync("/api/GroceryLists")).StatusCode);
+    }
+
+    [Fact]
+    public async Task ReadScopedTokenCanReadButCannotWrite()
+    {
+        using var host = CreateHost();
+        host.SetToken("grocery-lists.read");
+
+        Assert.Equal(HttpStatusCode.OK, (await host.Client.GetAsync("/api/GroceryLists")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden,
+            (await host.Client.PostAsJsonAsync("/api/GroceryLists", Request(new DateTime(2026, 11, 12)))).StatusCode);
+    }
+
+    [Fact]
+    public async Task ReadPolicyAcceptsScpClaimConvention()
+    {
+        using var host = CreateHost();
+        host.SetToken("grocery-lists.read", scopeClaimType: "scp");
+
+        Assert.Equal(HttpStatusCode.OK, (await host.Client.GetAsync("/api/GroceryLists")).StatusCode);
+    }
+
+    [Fact]
+    public async Task WriteScopedTokenCanCreateUpdateAndDelete()
+    {
+        using var host = CreateHost();
+        host.SetToken("grocery-lists.write");
+
+        using var createResponse = await host.Client.PostAsJsonAsync(
+            "/api/GroceryLists", Request(new DateTime(2026, 11, 12)));
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+        var created = await createResponse.Content.ReadFromJsonAsync<GroceryListResponse>();
+
+        Assert.Equal(HttpStatusCode.Forbidden, (await host.Client.GetAsync("/api/GroceryLists")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK,
+            (await host.Client.PutAsJsonAsync($"/api/GroceryLists/{created!.Id}", Request(new DateTime(2026, 11, 13)))).StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent,
+            (await host.Client.DeleteAsync($"/api/GroceryLists/{created.Id}")).StatusCode);
+    }
+
+    [Fact]
+    public async Task HealthIsPublicWithoutToken()
+    {
+        using var host = CreateHost();
+        host.Client.DefaultRequestHeaders.Authorization = null;
+
+        using var response = await host.Client.GetAsync("/health");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
     public async Task IngredientTimeoutReturnsServiceUnavailable()
     {
         using var host = CreateHost(new FakeIngredientClient(_ => throw new TimeoutException()));
@@ -213,9 +309,12 @@ public sealed class GroceryListsApiTests
         string environment = "Testing",
         string? ingredientApiBaseUrl = null)
     {
+        var signingKey = RSA.Create(2048);
         var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment(environment);
+            builder.UseSetting("Authentication:Authority", TestIssuer);
+            builder.UseSetting("Authentication:Audience", TestAudience);
             if (ingredientApiBaseUrl is not null)
             {
                 builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(
@@ -236,19 +335,54 @@ public sealed class GroceryListsApiTests
                     services.RemoveAll<IIngredientClient>();
                     services.AddSingleton<IIngredientClient>(ingredientClient);
                 }
+
+                services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+                {
+                    var discovery = new OpenIdConnectConfiguration { Issuer = TestIssuer };
+                    discovery.SigningKeys.Add(new RsaSecurityKey(signingKey) { KeyId = "grocery-test" });
+                    options.ConfigurationManager = new StaticConfigurationManager<OpenIdConnectConfiguration>(discovery);
+                });
             });
         });
-        return new TestHost(factory, ingredientClient);
+        var host = new TestHost(factory, ingredientClient, signingKey);
+        host.SetToken("grocery-lists.read grocery-lists.write");
+        return host;
     }
 
-    private sealed class TestHost(WebApplicationFactory<Program> factory, FakeIngredientClient? ingredientClient) : IDisposable
+    private sealed class TestHost(
+        WebApplicationFactory<Program> factory,
+        FakeIngredientClient? ingredientClient,
+        RSA signingKey) : IDisposable
     {
         public HttpClient Client { get; } = factory.CreateClient();
+
+        public void SetToken(
+            string scope,
+            bool expired = false,
+            string issuer = TestIssuer,
+            string audience = TestAudience,
+            string scopeClaimType = "scope")
+        {
+            var now = DateTime.UtcNow;
+            var credentials = new SigningCredentials(
+                new RsaSecurityKey(signingKey) { KeyId = "grocery-test" },
+                SecurityAlgorithms.RsaSha256);
+            var token = new JwtSecurityToken(
+                issuer,
+                audience,
+                [new Claim("sub", "grocery-test-user"), new Claim(scopeClaimType, scope)],
+                now.AddMinutes(-2),
+                expired ? now.AddMinutes(-1) : now.AddMinutes(10),
+                credentials);
+            var serialized = new JwtSecurityTokenHandler().WriteToken(token);
+            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", serialized);
+        }
 
         public void Dispose()
         {
             Client.Dispose();
             factory.Dispose();
+            signingKey.Dispose();
             ingredientClient?.ResetCallCount();
         }
     }

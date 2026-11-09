@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using GroceryList.Api.DTOs;
 using GroceryList.Api.Services;
@@ -10,6 +11,7 @@ namespace GroceryList.Api.Controllers;
 public sealed class GroceryListsController(GroceryListService service) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Policy = "grocery-lists.read")]
     [ProducesResponseType(typeof(IReadOnlyList<GroceryListResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<GroceryListResponse>>> GetGroceryLists(
         [FromQuery] DateTime? date,
@@ -17,6 +19,7 @@ public sealed class GroceryListsController(GroceryListService service) : Control
         Ok(await service.GetAllAsync(date, cancellationToken));
 
     [HttpGet("{id:int}")]
+    [Authorize(Policy = "grocery-lists.read")]
     [ProducesResponseType(typeof(GroceryListResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GroceryListResponse>> GetGroceryList(
@@ -30,6 +33,7 @@ public sealed class GroceryListsController(GroceryListService service) : Control
     }
 
     [HttpPost]
+    [Authorize(Policy = "grocery-lists.write")]
     [ProducesResponseType(typeof(GroceryListResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<GroceryListResponse>> CreateGroceryList(
@@ -41,6 +45,7 @@ public sealed class GroceryListsController(GroceryListService service) : Control
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = "grocery-lists.write")]
     [ProducesResponseType(typeof(GroceryListResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -56,6 +61,7 @@ public sealed class GroceryListsController(GroceryListService service) : Control
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = "grocery-lists.write")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteGroceryList(
