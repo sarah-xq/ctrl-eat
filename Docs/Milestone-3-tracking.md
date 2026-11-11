@@ -72,3 +72,9 @@ The author reported the following *locally executed* checks on branch `issue-14-
 - Merge commit **`24d9ae5`** was pushed to `origin/issue-14-daily-meal-plans`; `git status -sb` showed a clean branch tracking the remote.
 
 These are meaningful **integrated .NET build and automated test results**, but do not replace browser-based checks for every frontend, the author's independent diff/security review, teammate approval of the integrated revision, or verification of independent Ingredient and Recipe services. This information was supplied by the person executing the terminal commands; it is not represented as a separate CI run or independently repeated by the documentation preparer.
+
+## Published GitHub Project
+
+[CtrlEat - Milestone 3](https://github.com/users/Louis-FelixRDC/projects/1)
+
+The public board contains seven epics, 31 draft task cards, and existing repository issues and PRs. Tasks record ownership, acceptance criteria, and status; remaining verification is tracked separately.
