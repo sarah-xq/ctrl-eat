@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CtrlEat.csproj" />
+    <ProjectReference Include="..\src\GroceryList.Domain\GroceryList.Domain.csproj" />
   </ItemGroup>
 
 </Project>

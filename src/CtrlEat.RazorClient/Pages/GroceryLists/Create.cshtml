@@ -1,0 +1,8 @@
+@page
+@model CtrlEat.RazorClient.Pages.GroceryLists.CreateModel
+@{
+    ViewData["Title"] = "Create Grocery List";
+}
+<h1>Create Grocery List</h1>
+@if (Model.ErrorMessage is not null) { <div class="alert" role="alert">@Model.ErrorMessage</div> }
+<form method="post" class="form"><partial name="_Form" model="Model" /></form>

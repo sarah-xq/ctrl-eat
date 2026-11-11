@@ -1,0 +1,5 @@
+@model CtrlEat.RazorClient.Pages.GroceryLists.FormModel
+<div asp-validation-summary="ModelOnly" class="alert"></div>
+<label asp-for="Input.Date">Date</label><input asp-for="Input.Date" type="date" /><span asp-validation-for="Input.Date"></span>
+<label asp-for="IngredientIdsText">Ingredient IDs (comma-separated, optional)</label><input asp-for="IngredientIdsText" placeholder="1, 2, 3" /><span asp-validation-for="IngredientIdsText"></span>
+<button type="submit">@Model.SubmitLabel</button> <a class="button secondary" asp-page="Index">Cancel</a>
