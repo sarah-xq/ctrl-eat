@@ -4,6 +4,14 @@
     <Project Path="src/GroceryList.Api/GroceryList.Api.csproj" />
     <Project Path="src/GroceryList.Data/GroceryList.Data.csproj" />
     <Project Path="src/GroceryList.Domain/GroceryList.Domain.csproj" />
+    <Project Path="src/Ingredient.Api/Ingredient.Api.csproj" />
+    <Project Path="src/Ingredient.Client/Ingredient.Client.csproj" />
+    <Project Path="src/Ingredient.Data/Ingredient.Data.csproj" />
+    <Project Path="src/Ingredient.Domain/Ingredient.Domain.csproj" />
+    <Project Path="src/Recipe.Api/Recipe.Api.csproj" />
+    <Project Path="src/Recipe.Client/Recipe.Client.csproj" />
+    <Project Path="src/Recipe.Data/Recipe.Data.csproj" />
+    <Project Path="src/Recipe.Domain/Recipe.Domain.csproj" />
     <Project Path="src/StorageLocation.Api/StorageLocation.Api.csproj" />
     <Project Path="src/StorageLocation.Data/StorageLocation.Data.csproj" />
     <Project Path="src/StorageLocation.Domain/StorageLocation.Domain.csproj" />
@@ -13,6 +21,10 @@
     <Project Path="tests/GroceryList.ApiTests/GroceryList.ApiTests.csproj" />
     <Project Path="tests/GroceryList.DataTests/GroceryList.DataTests.csproj" />
     <Project Path="tests/GroceryList.UnitTests/GroceryList.UnitTests.csproj" />
+    <Project Path="tests/Ingredient.ApiTests/Ingredient.ApiTests.csproj" />
+    <Project Path="tests/Ingredient.UnitTests/Ingredient.UnitTests.csproj" />
+    <Project Path="tests/Recipe.ApiTests/Recipe.ApiTests.csproj" />
+    <Project Path="tests/Recipe.UnitTests/Recipe.UnitTests.csproj" />
     <Project Path="tests/StorageLocation.ApiTests/StorageLocation.ApiTests.csproj" />
     <Project Path="tests/StorageLocation.DataTests/StorageLocation.DataTests.csproj" />
     <Project Path="tests/StorageLocation.UnitTests/StorageLocation.UnitTests.csproj" />

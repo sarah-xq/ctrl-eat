@@ -1,0 +1,52 @@
+@page
+@model Ingredient.Client.Pages.IndexModel
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"/><title>Ingredient Management</title>
+<style>body{font:16px system-ui;margin:32px auto;max-width:1150px}fieldset{margin:14px 0;padding:12px}label{display:inline-block;margin:8px}input,select{padding:5px}table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #bbb;padding:8px;text-align:left}</style>
+</head><body><main>
+<h1>Ingredients</h1><p><a href="/logout">Sign out</a></p>
+@if (Model.Error is not null) { <p role="alert">@Model.Error</p> }
+<h2>Add or update ingredient</h2>
+<form method="post" asp-page-handler="Save">
+<fieldset><legend>Basic and expiry information</legend>
+<label>ID (0 to create) <input name="Id" type="number" min="0" value="@Model.Id" /></label>
+<label>Name <input name="Name" value="@Model.Name" required maxlength="200" /></label>
+<label>Food group <input name="FoodGroup" value="@Model.FoodGroup" required maxlength="100" /></label>
+<label>Calories per serving <input name="Calories" type="number" min="0" step="any" value="@Model.Calories" required /></label>
+<label>Expiry date <input name="ExpiryDate" type="date" value="@(Model.ExpiryDate?.ToString("yyyy-MM-dd"))" /></label>
+<label>Storage method <select name="StorageMethod"><option>RoomTemperature</option><option>Refrigerated</option><option>Frozen</option></select></label>
+<label>Batch number <input name="BatchNumber" value="@Model.BatchNumber" maxlength="100" /></label>
+<label>Warning days <input name="AlertThresholdDays" type="number" min="0" max="365" value="@Model.AlertThresholdDays" /></label>
+</fieldset>
+<fieldset><legend>Nutrition per serving</legend>
+<label>Protein (g) <input name="ProteinGrams" type="number" step="any" min="0" value="@Model.ProteinGrams" /></label>
+<label>Carbohydrates (g) <input name="CarbohydratesGrams" type="number" step="any" min="0" value="@Model.CarbohydratesGrams" /></label>
+<label>Fat (g) <input name="FatGrams" type="number" step="any" min="0" value="@Model.FatGrams" /></label>
+<label>Fiber (g) <input name="FiberGrams" type="number" step="any" min="0" value="@Model.FiberGrams" /></label>
+<label>Sugar (g) <input name="SugarGrams" type="number" step="any" min="0" value="@Model.SugarGrams" /></label>
+<label>Sodium (mg) <input name="SodiumMilligrams" type="number" step="any" min="0" value="@Model.SodiumMilligrams" /></label>
+<label>Cholesterol (mg) <input name="CholesterolMilligrams" type="number" step="any" min="0" value="@Model.CholesterolMilligrams" /></label>
+<label>Serving size <input name="ServingSize" value="@Model.ServingSize" /></label>
+<label>Source <input name="DataSource" value="@Model.DataSource" /></label>
+<label>Source date <input name="SourceDate" type="date" value="@(Model.SourceDate?.ToString("yyyy-MM-dd"))" /></label>
+<label>Vitamins/minerals (mg), e.g. Iron=4;VitaminC=10 <input name="VitaminsMineralsText" value="@Model.VitaminsMineralsText" size="38" /></label>
+</fieldset>
+<fieldset><legend>Allergens</legend>
+<label>Comma-separated Name:Presence (Contains, MayContain, Trace)
+<input name="AllergensText" value="@Model.AllergensText" size="70" placeholder="Milk:Contains, Peanuts:MayContain" /></label>
+</fieldset>
+<button type="submit">Save ingredient</button></form>
+<h2>Expiry alerts</h2>
+@if (!Model.Alerts.Any()) { <p>No ingredients currently expiring or expired.</p> }
+else { <ul>@foreach (var alert in Model.Alerts) { <li>@alert.Name: @alert.DaysUntilExpiry day(s) until expiry</li> }</ul> }
+<h2>Saved ingredients</h2>
+<table><thead><tr><th>ID</th><th>Name</th><th>Group</th><th>Calories</th><th>Nutrition (P/C/F g)</th><th>Allergens</th><th>Expiry</th><th>Action</th></tr></thead><tbody>
+@foreach (var item in Model.Items)
+{
+<tr><td>@item.Id</td><td>@item.Name</td><td>@item.FoodGroup</td><td>@item.Calories</td>
+<td>@item.Nutrition?.ProteinGrams / @item.Nutrition?.CarbohydratesGrams / @item.Nutrition?.FatGrams</td>
+<td>@string.Join(", ", item.Allergens?.Select(a => a.Name) ?? Array.Empty<string>())</td>
+<td>@item.ExpiryDate?.ToString("yyyy-MM-dd") (@item.DaysUntilExpiry days)</td>
+<td><form method="post" asp-page-handler="Delete" asp-route-id="@item.Id"><button>Delete</button></form></td></tr>
+}
+</tbody></table></main></body></html>

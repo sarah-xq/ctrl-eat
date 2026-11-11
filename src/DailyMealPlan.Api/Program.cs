@@ -29,10 +29,12 @@ public partial class Program
         var recipeUrl = builder.Configuration["LookupServices:RecipeBaseUrl"] ?? lookupUrl;
         var ingredientUrl = builder.Configuration["LookupServices:IngredientBaseUrl"] ?? lookupUrl;
         builder.Services.AddHttpClient<RecipeLookupClient>(client =>
-            client.BaseAddress = new Uri(recipeUrl.TrimEnd('/') + "/"));
+            client.BaseAddress = new Uri(recipeUrl.TrimEnd('/') + "/")).AddHttpMessageHandler<DownstreamBearerHandler>();
         builder.Services.AddHttpClient<IngredientLookupClient>(client =>
-            client.BaseAddress = new Uri(ingredientUrl.TrimEnd('/') + "/"));
+            client.BaseAddress = new Uri(ingredientUrl.TrimEnd('/') + "/")).AddHttpMessageHandler<DownstreamBearerHandler>();
 
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddTransient<DownstreamBearerHandler>();
         builder.Services.AddControllers();
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>

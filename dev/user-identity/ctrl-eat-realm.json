@@ -1,136 +1,388 @@
 {
-  "realm": "ctrl-eat",
-  "enabled": true,
-  "registrationAllowed": true,
-  "sslRequired": "external",
-  "clients": [
-    {
-      "clientId": "ctrleat-client",
-      "enabled": true,
-      "publicClient": true,
-      "protocol": "openid-connect",
-      "standardFlowEnabled": true,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
-      "redirectUris": [
-        "http://localhost:5173/callback"
-      ],
-      "webOrigins": [
-        "http://localhost:5173"
-      ],
-      "attributes": {
-        "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "http://localhost:5173/"
-      },
-      "optionalClientScopes": [
-        "users.read",
-        "users.write"
-      ],
-      "defaultClientScopes": [
-        "basic",
-        "profile"
-      ],
-      "protocolMappers": [
-        {
-          "name": "User API audience",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-audience-mapper",
-          "config": {
-            "included.custom.audience": "ctrleat-users",
-            "access.token.claim": "true",
-            "id.token.claim": "false"
-          }
-        },
-        {
-          "protocolMapper": "oidc-sub-mapper",
-          "config": {
-            "id.token.claim": "true",
-            "access.token.claim": "true"
-          },
-          "name": "User subject",
-          "protocol": "openid-connect"
-        }
-      ],
-      "fullScopeAllowed": false
-    },
-    {
-      "clientId": "ctrleat-mealplans-client",
-      "enabled": true,
-      "publicClient": true,
-      "protocol": "openid-connect",
-      "standardFlowEnabled": true,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
-      "redirectUris": [
-        "http://localhost:5184/signin-oidc"
-      ],
-      "webOrigins": [
-        "http://localhost:5184"
-      ],
-      "attributes": {
-        "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "http://localhost:5184/signout-callback-oidc"
-      },
-      "optionalClientScopes": [
-        "daily-meal-plans.read",
-        "daily-meal-plans.write"
-      ],
-      "defaultClientScopes": [
-        "basic",
-        "profile"
-      ],
-      "protocolMappers": [
-        {
-          "name": "Meal plan API audience",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-audience-mapper",
-          "config": {
-            "included.custom.audience": "ctrleat-mealplans",
-            "access.token.claim": "true",
-            "id.token.claim": "false"
-          }
-        },
-        {
-          "protocolMapper": "oidc-sub-mapper",
-          "config": {
-            "id.token.claim": "true",
-            "access.token.claim": "true"
-          },
-          "name": "User subject",
-          "protocol": "openid-connect"
-        }
-      ],
-      "fullScopeAllowed": false
-    }
-  ],
-  "clientScopes": [
-    {
-      "name": "users.read",
-      "protocol": "openid-connect",
-      "attributes": {
-        "include.in.token.scope": "true"
-      }
-    },
-    {
-      "name": "users.write",
-      "protocol": "openid-connect",
-      "attributes": {
-        "include.in.token.scope": "true"
-      }
-    },
-    {
-      "name": "daily-meal-plans.read",
-      "protocol": "openid-connect",
-      "attributes": {
-        "include.in.token.scope": "true"
-      }
-    },
-    {
-      "name": "daily-meal-plans.write",
-      "protocol": "openid-connect",
-      "attributes": {
-        "include.in.token.scope": "true"
-      }
-    }
-  ]
+    "realm":  "ctrl-eat",
+    "enabled":  true,
+    "registrationAllowed":  true,
+    "sslRequired":  "external",
+    "clients":  [
+                    {
+                        "clientId":  "ctrleat-client",
+                        "enabled":  true,
+                        "publicClient":  true,
+                        "protocol":  "openid-connect",
+                        "standardFlowEnabled":  true,
+                        "implicitFlowEnabled":  false,
+                        "directAccessGrantsEnabled":  false,
+                        "redirectUris":  [
+                                             "http://localhost:5173/callback"
+                                         ],
+                        "webOrigins":  [
+                                           "http://localhost:5173"
+                                       ],
+                        "attributes":  {
+                                           "pkce.code.challenge.method":  "S256",
+                                           "post.logout.redirect.uris":  "http://localhost:5173/"
+                                       },
+                        "optionalClientScopes":  [
+                                                     "users.read",
+                                                     "users.write"
+                                                 ],
+                        "defaultClientScopes":  [
+                                                    "basic",
+                                                    "profile"
+                                                ],
+                        "protocolMappers":  [
+                                                {
+                                                    "name":  "User API audience",
+                                                    "protocol":  "openid-connect",
+                                                    "protocolMapper":  "oidc-audience-mapper",
+                                                    "config":  {
+                                                                   "included.custom.audience":  "ctrleat-users",
+                                                                   "access.token.claim":  "true",
+                                                                   "id.token.claim":  "false"
+                                                               }
+                                                },
+                                                {
+                                                    "protocolMapper":  "oidc-sub-mapper",
+                                                    "config":  {
+                                                                   "id.token.claim":  "true",
+                                                                   "access.token.claim":  "true"
+                                                               },
+                                                    "name":  "User subject",
+                                                    "protocol":  "openid-connect"
+                                                }
+                                            ],
+                        "fullScopeAllowed":  false
+                    },
+                    {
+                        "clientId":  "ctrleat-mealplans-client",
+                        "enabled":  true,
+                        "publicClient":  true,
+                        "protocol":  "openid-connect",
+                        "standardFlowEnabled":  true,
+                        "implicitFlowEnabled":  false,
+                        "directAccessGrantsEnabled":  false,
+                        "redirectUris":  [
+                                             "http://localhost:5184/signin-oidc"
+                                         ],
+                        "webOrigins":  [
+                                           "http://localhost:5184"
+                                       ],
+                        "attributes":  {
+                                           "pkce.code.challenge.method":  "S256",
+                                           "post.logout.redirect.uris":  "http://localhost:5184/signout-callback-oidc"
+                                       },
+                        "optionalClientScopes":  [
+                                                     "daily-meal-plans.read",
+                                                     "daily-meal-plans.write",
+                                                     "recipes.read",
+                                                     "ingredients.read"
+                                                 ],
+                        "defaultClientScopes":  [
+                                                    "basic",
+                                                    "profile"
+                                                ],
+                        "protocolMappers":  [
+                                                {
+                                                    "name":  "Meal plan API audience",
+                                                    "protocol":  "openid-connect",
+                                                    "protocolMapper":  "oidc-audience-mapper",
+                                                    "config":  {
+                                                                   "included.custom.audience":  "ctrleat-mealplans",
+                                                                   "access.token.claim":  "true",
+                                                                   "id.token.claim":  "false"
+                                                               }
+                                                },
+                                                {
+                                                    "protocolMapper":  "oidc-sub-mapper",
+                                                    "config":  {
+                                                                   "id.token.claim":  "true",
+                                                                   "access.token.claim":  "true"
+                                                               },
+                                                    "name":  "User subject",
+                                                    "protocol":  "openid-connect"
+                                                },
+                                                {
+                                                    "name":  "Audience ctrleat-recipes",
+                                                    "protocol":  "openid-connect",
+                                                    "protocolMapper":  "oidc-audience-mapper",
+                                                    "config":  {
+                                                                   "access.token.claim":  "true",
+                                                                   "included.custom.audience":  "ctrleat-recipes",
+                                                                   "id.token.claim":  "false"
+                                                               }
+                                                },
+                                                {
+                                                    "name":  "Audience ctrleat-ingredients",
+                                                    "protocol":  "openid-connect",
+                                                    "protocolMapper":  "oidc-audience-mapper",
+                                                    "config":  {
+                                                                   "access.token.claim":  "true",
+                                                                   "included.custom.audience":  "ctrleat-ingredients",
+                                                                   "id.token.claim":  "false"
+                                                               }
+                                                }
+                                            ],
+                        "fullScopeAllowed":  false
+                    },
+                    {
+                        "clientId":  "ctrleat-ingredients-client",
+                        "enabled":  true,
+                        "publicClient":  true,
+                        "protocol":  "openid-connect",
+                        "standardFlowEnabled":  true,
+                        "implicitFlowEnabled":  false,
+                        "directAccessGrantsEnabled":  false,
+                        "redirectUris":  [
+                                             "http://localhost:5185/signin-oidc"
+                                         ],
+                        "webOrigins":  [
+                                           "http://localhost:5185"
+                                       ],
+                        "attributes":  {
+                                           "post.logout.redirect.uris":  "http://localhost:5185/signout-callback-oidc",
+                                           "pkce.code.challenge.method":  "S256"
+                                       },
+                        "optionalClientScopes":  [
+                                                     "ingredients.read",
+                                                     "ingredients.write"
+                                                 ],
+                        "defaultClientScopes":  [
+                                                    "basic",
+                                                    "profile"
+                                                ],
+                        "protocolMappers":  [
+                                                {
+                                                    "name":  "Audience ctrleat-ingredients",
+                                                    "protocol":  "openid-connect",
+                                                    "protocolMapper":  "oidc-audience-mapper",
+                                                    "config":  {
+                                                                   "access.token.claim":  "true",
+                                                                   "included.custom.audience":  "ctrleat-ingredients",
+                                                                   "id.token.claim":  "false"
+                                                               }
+                                                },
+                                                {
+                                                    "name":  "Subject",
+                                                    "protocol":  "openid-connect",
+                                                    "protocolMapper":  "oidc-sub-mapper",
+                                                    "config":  {
+                                                                   "id.token.claim":  "true",
+                                                                   "access.token.claim":  "true"
+                                                               }
+                                                }
+                                            ],
+                        "fullScopeAllowed":  false
+                    },
+                    {
+                        "clientId":  "ctrleat-recipes-client",
+                        "enabled":  true,
+                        "publicClient":  true,
+                        "protocol":  "openid-connect",
+                        "standardFlowEnabled":  true,
+                        "implicitFlowEnabled":  false,
+                        "directAccessGrantsEnabled":  false,
+                        "redirectUris":  [
+                                             "http://localhost:5186/signin-oidc"
+                                         ],
+                        "webOrigins":  [
+                                           "http://localhost:5186"
+                                       ],
+                        "attributes":  {
+                                           "post.logout.redirect.uris":  "http://localhost:5186/signout-callback-oidc",
+                                           "pkce.code.challenge.method":  "S256"
+                                       },
+                        "optionalClientScopes":  [
+                                                     "recipes.read",
+                                                     "recipes.write",
+                                                     "ingredients.read"
+                                                 ],
+                        "defaultClientScopes":  [
+                                                    "basic",
+                                                    "profile"
+                                                ],
+                        "protocolMappers":  [
+                                                {
+                                                    "name":  "Audience ctrleat-recipes",
+                                                    "protocol":  "openid-connect",
+                                                    "protocolMapper":  "oidc-audience-mapper",
+                                                    "config":  {
+                                                                   "access.token.claim":  "true",
+                                                                   "included.custom.audience":  "ctrleat-recipes",
+                                                                   "id.token.claim":  "false"
+                                                               }
+                                                },
+                                                {
+                                                    "name":  "Audience ctrleat-ingredients",
+                                                    "protocol":  "openid-connect",
+                                                    "protocolMapper":  "oidc-audience-mapper",
+                                                    "config":  {
+                                                                   "access.token.claim":  "true",
+                                                                   "included.custom.audience":  "ctrleat-ingredients",
+                                                                   "id.token.claim":  "false"
+                                                               }
+                                                },
+                                                {
+                                                    "name":  "Subject",
+                                                    "protocol":  "openid-connect",
+                                                    "protocolMapper":  "oidc-sub-mapper",
+                                                    "config":  {
+                                                                   "id.token.claim":  "true",
+                                                                   "access.token.claim":  "true"
+                                                               }
+                                                }
+                                            ],
+                        "fullScopeAllowed":  false
+                    },
+                    {
+                        "clientId":  "ctrleat-razor-client",
+                        "enabled":  true,
+                        "publicClient":  true,
+                        "protocol":  "openid-connect",
+                        "standardFlowEnabled":  true,
+                        "implicitFlowEnabled":  false,
+                        "directAccessGrantsEnabled":  false,
+                        "redirectUris":  [
+                                             "https://localhost:60627/signin-oidc",
+                                             "http://localhost:60628/signin-oidc"
+                                         ],
+                        "webOrigins":  [
+                                           "https://localhost:60627",
+                                           "http://localhost:60628"
+                                       ],
+                        "attributes":  {
+                                           "post.logout.redirect.uris":  "+",
+                                           "pkce.code.challenge.method":  "S256"
+                                       },
+                        "optionalClientScopes":  [
+                                                     "storage-locations.read",
+                                                     "storage-locations.write",
+                                                     "grocery-lists.read",
+                                                     "grocery-lists.write",
+                                                     "ingredients.read"
+                                                 ],
+                        "defaultClientScopes":  [
+                                                    "basic",
+                                                    "profile"
+                                                ],
+                        "protocolMappers":  [
+                                                {
+                                                    "name":  "Audience ctrleat-storage-locations",
+                                                    "protocol":  "openid-connect",
+                                                    "protocolMapper":  "oidc-audience-mapper",
+                                                    "config":  {
+                                                                   "access.token.claim":  "true",
+                                                                   "included.custom.audience":  "ctrleat-storage-locations",
+                                                                   "id.token.claim":  "false"
+                                                               }
+                                                },
+                                                {
+                                                    "name":  "Audience ctrleat-grocery-lists",
+                                                    "protocol":  "openid-connect",
+                                                    "protocolMapper":  "oidc-audience-mapper",
+                                                    "config":  {
+                                                                   "access.token.claim":  "true",
+                                                                   "included.custom.audience":  "ctrleat-grocery-lists",
+                                                                   "id.token.claim":  "false"
+                                                               }
+                                                },
+                                                {
+                                                    "name":  "Audience ctrleat-ingredients",
+                                                    "protocol":  "openid-connect",
+                                                    "protocolMapper":  "oidc-audience-mapper",
+                                                    "config":  {
+                                                                   "access.token.claim":  "true",
+                                                                   "included.custom.audience":  "ctrleat-ingredients",
+                                                                   "id.token.claim":  "false"
+                                                               }
+                                                }
+                                            ],
+                        "fullScopeAllowed":  false
+                    }
+                ],
+    "clientScopes":  [
+                         {
+                             "name":  "users.read",
+                             "protocol":  "openid-connect",
+                             "attributes":  {
+                                                "include.in.token.scope":  "true"
+                                            }
+                         },
+                         {
+                             "name":  "users.write",
+                             "protocol":  "openid-connect",
+                             "attributes":  {
+                                                "include.in.token.scope":  "true"
+                                            }
+                         },
+                         {
+                             "name":  "daily-meal-plans.read",
+                             "protocol":  "openid-connect",
+                             "attributes":  {
+                                                "include.in.token.scope":  "true"
+                                            }
+                         },
+                         {
+                             "name":  "daily-meal-plans.write",
+                             "protocol":  "openid-connect",
+                             "attributes":  {
+                                                "include.in.token.scope":  "true"
+                                            }
+                         },
+                         {
+                             "name":  "ingredients.read",
+                             "protocol":  "openid-connect",
+                             "attributes":  {
+                                                "include.in.token.scope":  "true"
+                                            }
+                         },
+                         {
+                             "name":  "ingredients.write",
+                             "protocol":  "openid-connect",
+                             "attributes":  {
+                                                "include.in.token.scope":  "true"
+                                            }
+                         },
+                         {
+                             "name":  "recipes.read",
+                             "protocol":  "openid-connect",
+                             "attributes":  {
+                                                "include.in.token.scope":  "true"
+                                            }
+                         },
+                         {
+                             "name":  "recipes.write",
+                             "protocol":  "openid-connect",
+                             "attributes":  {
+                                                "include.in.token.scope":  "true"
+                                            }
+                         },
+                         {
+                             "name":  "storage-locations.read",
+                             "protocol":  "openid-connect",
+                             "attributes":  {
+                                                "include.in.token.scope":  "true"
+                                            }
+                         },
+                         {
+                             "name":  "storage-locations.write",
+                             "protocol":  "openid-connect",
+                             "attributes":  {
+                                                "include.in.token.scope":  "true"
+                                            }
+                         },
+                         {
+                             "name":  "grocery-lists.read",
+                             "protocol":  "openid-connect",
+                             "attributes":  {
+                                                "include.in.token.scope":  "true"
+                                            }
+                         },
+                         {
+                             "name":  "grocery-lists.write",
+                             "protocol":  "openid-connect",
+                             "attributes":  {
+                                                "include.in.token.scope":  "true"
+                                            }
+                         }
+                     ]
 }

@@ -335,6 +335,7 @@ public sealed class StorageLocationsApiTests
             builder.UseEnvironment(environment);
             builder.UseSetting("ConnectionStrings:StorageLocation", $"Data Source={databasePath};Pooling=False");
             builder.UseSetting("IngredientApi:BaseUrl", "http://ingredient.test/");
+            builder.UseSetting("IngredientApi:UseSimulatedTransport", useConfiguredIngredientClient ? "true" : "false");
             builder.UseSetting("Authentication:Authority", TestIssuer);
             builder.UseSetting("Authentication:Audience", TestAudience);
             builder.ConfigureTestServices(services =>

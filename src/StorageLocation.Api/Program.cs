@@ -25,6 +25,8 @@ public partial class Program
             throw new InvalidOperationException("IngredientApi:BaseUrl must be configured as an absolute HTTP or HTTPS URL.");
         }
 
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddTransient<DownstreamBearerHandler>();
         builder.Services.AddDbContext<StorageLocationDbContext>(options => options.UseSqlite(connectionString));
         builder.Services.AddScoped<IStorageLocationRepository, StorageLocationRepository>();
         builder.Services.AddScoped<StorageLocationService>();
@@ -32,7 +34,8 @@ public partial class Program
         {
             client.BaseAddress = ingredientApiUri;
         });
-        if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing"))
+        ingredientClient.AddHttpMessageHandler<DownstreamBearerHandler>();
+        if (builder.Environment.IsEnvironment("Testing") || (builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("IngredientApi:UseSimulatedTransport")))
         {
             ingredientClient.ConfigurePrimaryHttpMessageHandler(() => new DevelopmentIngredientHandler());
         }

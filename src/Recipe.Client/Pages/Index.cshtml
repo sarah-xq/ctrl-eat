@@ -1,0 +1,28 @@
+@page
+@model Recipe.Client.Pages.IndexModel
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"/><title>Recipe Management</title>
+<style>body{font:16px system-ui;max-width:1100px;margin:36px auto}label{display:inline-block;margin:8px}input{padding:5px}table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #bbb;padding:8px;text-align:left}</style>
+</head><body><main><h1>Recipes</h1><p><a href="/logout">Sign out</a></p>
+@if (Model.Error is not null) { <p role="alert">@Model.Error</p> }
+<h2>Add or update recipe</h2>
+<form method="post" asp-page-handler="Save">
+<label>ID (0 to create) <input name="Id" type="number" min="0" value="@Model.Id" /></label>
+<label>Name <input name="Name" value="@Model.Name" required /></label>
+<label>Author <input name="Author" value="@Model.Author" /></label>
+<label>Description <input name="Description" value="@Model.Description" /></label>
+<label>Total minutes <input name="TotalTimeMinutes" type="number" min="0" value="@Model.TotalTimeMinutes" required /></label>
+<label>Cook minutes <input name="CookTimeMinutes" type="number" min="0" value="@Model.CookTimeMinutes" required /></label>
+<p><label>Ingredients (ID:Quantity:Unit, comma-separated)
+<input name="IngredientsText" value="@Model.IngredientsText" size="75" placeholder="7:2:serving,8:1:cup" /></label></p>
+<button type="submit">Save recipe</button></form>
+<h2>Saved recipes</h2>
+<table><thead><tr><th>ID</th><th>Name</th><th>Author</th><th>Calories</th><th>Nutrition P/C/F (g)</th><th>Allergens</th><th>Action</th></tr></thead><tbody>
+@foreach (var item in Model.Items)
+{
+<tr><td>@item.Id</td><td>@item.Name</td><td>@item.Author</td><td>@item.TotalCalories</td>
+<td>@item.Nutrition?.ProteinGrams / @item.Nutrition?.CarbohydratesGrams / @item.Nutrition?.FatGrams</td>
+<td>@string.Join(", ", item.Allergens?.Select(a => a.Name) ?? Array.Empty<string>())</td>
+<td><form method="post" asp-page-handler="Delete" asp-route-id="@item.Id"><button>Delete</button></form></td></tr>
+}
+</tbody></table></main></body></html>

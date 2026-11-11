@@ -72,6 +72,8 @@ builder.Services.AddAuthentication(options =>
     options.Scope.Add("openid");
     options.Scope.Add("daily-meal-plans.read");
     options.Scope.Add("daily-meal-plans.write");
+    options.Scope.Add("recipes.read");
+    options.Scope.Add("ingredients.read");
 });
 
 var app = builder.Build();
