@@ -12,7 +12,15 @@ public sealed class RecipeDbContext(DbContextOptions<RecipeDbContext> options) :
         recipe.HasKey(x => x.Id);
         recipe.Property(x => x.Name).IsRequired().HasMaxLength(200);
         recipe.Property(x => x.TotalCalories).HasPrecision(18, 3);
-        recipe.HasMany(x => x.Ingredients).WithOne().HasForeignKey(x => x.RecipeId).OnDelete(DeleteBehavior.Cascade);
+        foreach (var property in new[] { nameof(Recipe.Domain.Recipe.ProteinGrams), nameof(Recipe.Domain.Recipe.CarbohydratesGrams),
+            nameof(Recipe.Domain.Recipe.FatGrams), nameof(Recipe.Domain.Recipe.FiberGrams),
+            nameof(Recipe.Domain.Recipe.SugarGrams), nameof(Recipe.Domain.Recipe.SodiumMilligrams),
+            nameof(Recipe.Domain.Recipe.CholesterolMilligrams) })
+            recipe.Property<decimal>(property).HasPrecision(18, 3);
+        recipe.Property(x => x.AllergensJson).IsRequired();
+        recipe.Property(x => x.VitaminsMineralsJson).IsRequired();
+        recipe.HasMany(x => x.Ingredients).WithOne().HasForeignKey(x => x.RecipeId)
+            .OnDelete(DeleteBehavior.Cascade);
         var ingredient = builder.Entity<RecipeIngredient>();
         ingredient.HasKey(x => x.Id);
         ingredient.HasIndex(x => new { x.RecipeId, x.IngredientId }).IsUnique();

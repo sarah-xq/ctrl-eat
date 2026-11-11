@@ -21,14 +21,17 @@ var authority = builder.Configuration["Authentication:Authority"]
 var audience = builder.Configuration["Authentication:Audience"]
     ?? throw new InvalidOperationException("Authentication:Audience is required.");
 
-builder.Services.AddDbContext<GroceryListDbContext>(options => options.UseSqlite(connectionString));
+builder.Services.AddHttpContextAccessor();
+        builder.Services.AddTransient<DownstreamBearerHandler>();
+        builder.Services.AddDbContext<GroceryListDbContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddScoped<IGroceryListRepository, GroceryListRepository>();
 builder.Services.AddScoped<GroceryListService>();
 var ingredientHttpClient = builder.Services.AddHttpClient<HttpIngredientClient>(client =>
 {
     client.BaseAddress = ingredientApiUri;
 });
-if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing"))
+ingredientHttpClient.AddHttpMessageHandler<DownstreamBearerHandler>();
+        if (builder.Environment.IsEnvironment("Testing"))
 {
     ingredientHttpClient.ConfigurePrimaryHttpMessageHandler(() => new DevelopmentIngredientHandler());
 }
