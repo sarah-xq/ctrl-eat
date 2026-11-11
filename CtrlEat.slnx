@@ -21,7 +21,9 @@
     <Project Path="tests/GroceryList.ApiTests/GroceryList.ApiTests.csproj" />
     <Project Path="tests/GroceryList.DataTests/GroceryList.DataTests.csproj" />
     <Project Path="tests/GroceryList.UnitTests/GroceryList.UnitTests.csproj" />
+    <Project Path="tests/Ingredient.ApiTests/Ingredient.ApiTests.csproj" />
     <Project Path="tests/Ingredient.UnitTests/Ingredient.UnitTests.csproj" />
+    <Project Path="tests/Recipe.ApiTests/Recipe.ApiTests.csproj" />
     <Project Path="tests/Recipe.UnitTests/Recipe.UnitTests.csproj" />
     <Project Path="tests/StorageLocation.ApiTests/StorageLocation.ApiTests.csproj" />
     <Project Path="tests/StorageLocation.DataTests/StorageLocation.DataTests.csproj" />
