@@ -1,0 +1,16 @@
+@page
+@model Ingredient.Client.Pages.IndexModel
+<!doctype html><html><head><meta charset="utf-8"/><title>Ingredient Management</title></head>
+<body><main style="font:16px system-ui;max-width:850px;margin:40px auto">
+<h1>Ingredients</h1><p><a href="/logout">Sign out</a></p>
+@if (Model.Error is not null) { <p role="alert">@Model.Error</p> }
+<h2>Add or update ingredient</h2>
+<form method="post" asp-page-handler="Save">
+<label>ID (leave 0 to create) <input name="Id" type="number" min="0" value="0" /></label>
+<label>Name <input name="Name" required /></label>
+<label>Food group <input name="FoodGroup" required /></label>
+<label>Calories <input name="Calories" type="number" min="0" step="0.01" required /></label>
+<button type="submit">Save</button></form>
+<h2>Saved ingredients</h2><table cellpadding="8"><thead><tr><th>ID</th><th>Name</th><th>Group</th><th>Calories</th><th>Action</th></tr></thead><tbody>
+@foreach (var item in Model.Items) { <tr><td>@item.Id</td><td>@item.Name</td><td>@item.FoodGroup</td><td>@item.Calories</td><td><form method="post" asp-page-handler="Delete" asp-route-id="@item.Id"><button>Delete</button></form></td></tr> }
+</tbody></table></main></body></html>
