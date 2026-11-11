@@ -5,7 +5,7 @@ Evidence snapshot: November 10, 2026. This is a repository export supporting, bu
 | Owner | Service | Work item / pull request | Status and next gate |
 | --- | --- | --- | --- |
 | Félix (`Louis-FelixRDC`) | User | [Issue #12](https://github.com/sarah-xq/ctrl-eat/issues/12), [merged PR #13](https://github.com/sarah-xq/ctrl-eat/pull/13) | Layered API, database and React client merged. Recheck on final integrated branch. |
-| Félix | Daily Meal Plan | [Issue #14](https://github.com/sarah-xq/ctrl-eat/issues/14), [open PR #16](https://github.com/sarah-xq/ctrl-eat/pull/16) | Implemented on PR branch, but conflicts with milestone branch; author's personal verification is outstanding. |
+| Félix | Daily Meal Plan | [Issue #14](https://github.com/sarah-xq/ctrl-eat/issues/14), [merged PR #16](https://github.com/sarah-xq/ctrl-eat/pull/16) | Merged November 11, 2026 (052c03d). Integrated .NET build passed and 169/169 tests succeeded. Independent functional and diff review remains to be recorded. |
 | Zachary (`ZacharyAbergel`) | Storage Location | [merged PR #18](https://github.com/sarah-xq/ctrl-eat/pull/18) | Domain/Data/Api and frontend files merged; work item hierarchy, security tests and signoff need confirmation. |
 | Zachary | Grocery List | [merged PR #18](https://github.com/sarah-xq/ctrl-eat/pull/18) | Domain/Data/Api and frontend files merged; work item hierarchy, security tests and signoff need confirmation. |
 | Sarah (`sarah-xq`) | Ingredient | [legacy PR #1](https://github.com/sarah-xq/ctrl-eat/pull/1), [open Issue #19](https://github.com/sarah-xq/ctrl-eat/issues/19) | Milestone 3 independent layers, frontend, security and testing not verified. |
@@ -30,10 +30,10 @@ Acceptance criteria: authenticated dated plan create/list/edit/delete, saved cha
 - [x] API security, owner filtering and HTTP recipe/ingredient lookups
 - [x] Razor client via REST and OIDC PKCE
 - [x] Historical Validator report for `af17fbd`: 0 build errors/warnings, 21 tests passed; peer approval by Zachary
-- [ ] Resolve PR #16 conflicts without discarding newer team changes
-- [ ] Rerun build/tests, integration flows and frontend checks on the actual integrated tree
+- [x] Resolve PR #16 conflicts without discarding newer team changes
+- [x] Integrated .NET build and 169/169 automated tests passed; frontend/browser revalidation remains pending
 - [ ] Félix performs and records *his own* code diff and live functional/security review
-- [ ] Merge approved PR after all gates
+- [x] PR #16 merged on November 11, 2026 (052c03d)
 
 ## Zachary — Storage Location and Grocery List
 
@@ -57,7 +57,7 @@ Acceptance criteria: authenticated dated plan create/list/edit/delete, saved cha
 - [ ] Required custom agents and skill definitions verified (the branch contains `.github/agents` and `.github/skills`)
 - [ ] Every API's auth policy/scope mapping and tests confirmed (see `Milestone-3-authentication-and-validation.md`)
 - [ ] The 2–3 page architecture and reflection report addresses all four rubric topics
-- [ ] PR #16 conflicts resolved and final integrated build/test results recorded
+- [x] PR #16 conflicts resolved and integrated .NET build/test results recorded
 - [ ] R-PIV plans, human verification, peer approvals and security signoffs recorded for each applicable PR
 - [ ] Milestone-level **Azure DevOps** PR created against normal integration branch, branch retained, PR link submitted on Lea
 
