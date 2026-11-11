@@ -5,7 +5,7 @@ namespace CtrlEat.Repositories.Interfaces
 {
     public interface IStorageLocationRepository
     {
-        StorageLocation GetById(int id);
+        StorageLocation? GetById(int id);
         List<StorageLocation> GetAll();
         List<StorageLocation> GetByName(string name);
         List<StorageLocation> GetByType(string type);

@@ -6,7 +6,8 @@ using CtrlEat.Services;
 
 namespace CtrlEat.Controllers
 {
-    [ApiController]
+    // Legacy adapter exercised by regression tests. The standalone API owns the public routes.
+    [NonController]
     [Route("api/[controller]")]
     [Produces("application/json")]
     public class DailyMealPlansController : ControllerBase

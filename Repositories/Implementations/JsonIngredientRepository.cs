@@ -33,7 +33,7 @@ namespace CtrlEat.Repositories.Implementations
             }
         }
 
-        public Ingredient GetById(int id)
+        public Ingredient? GetById(int id)
         {
             var data = _fileHelper.ReadData<Ingredient>();
             return data.FirstOrDefault(i => i.Id == id);

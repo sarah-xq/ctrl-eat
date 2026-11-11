@@ -221,7 +221,8 @@ namespace CtrlEat.Services
             _repository.AddIngredient(recipeId, recipeIngredient);
 
             // Recalculate total calories
-            var updatedRecipe = _repository.GetById(recipeId);
+            var updatedRecipe = _repository.GetById(recipeId)
+                ?? throw new InvalidOperationException($"Recipe with id {recipeId} not found");
             updatedRecipe.TotalCalories = CalculateTotalCalories(updatedRecipe.RecipeIngredients);
             _repository.Update(updatedRecipe);
 
@@ -240,7 +241,8 @@ namespace CtrlEat.Services
             _repository.RemoveIngredient(recipeId, ingredientId);
 
             // Recalculate total calories
-            var updatedRecipe = _repository.GetById(recipeId);
+            var updatedRecipe = _repository.GetById(recipeId)
+                ?? throw new InvalidOperationException($"Recipe with id {recipeId} not found");
             updatedRecipe.TotalCalories = CalculateTotalCalories(updatedRecipe.RecipeIngredients);
             _repository.Update(updatedRecipe);
 

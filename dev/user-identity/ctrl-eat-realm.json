@@ -52,6 +52,55 @@
         }
       ],
       "fullScopeAllowed": false
+    },
+    {
+      "clientId": "ctrleat-mealplans-client",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://localhost:5184/signin-oidc"
+      ],
+      "webOrigins": [
+        "http://localhost:5184"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5184/signout-callback-oidc"
+      },
+      "optionalClientScopes": [
+        "daily-meal-plans.read",
+        "daily-meal-plans.write"
+      ],
+      "defaultClientScopes": [
+        "basic",
+        "profile"
+      ],
+      "protocolMappers": [
+        {
+          "name": "Meal plan API audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "ctrleat-mealplans",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        },
+        {
+          "protocolMapper": "oidc-sub-mapper",
+          "config": {
+            "id.token.claim": "true",
+            "access.token.claim": "true"
+          },
+          "name": "User subject",
+          "protocol": "openid-connect"
+        }
+      ],
+      "fullScopeAllowed": false
     }
   ],
   "clientScopes": [
@@ -64,6 +113,20 @@
     },
     {
       "name": "users.write",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true"
+      }
+    },
+    {
+      "name": "daily-meal-plans.read",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true"
+      }
+    },
+    {
+      "name": "daily-meal-plans.write",
       "protocol": "openid-connect",
       "attributes": {
         "include.in.token.scope": "true"

@@ -11,8 +11,8 @@ namespace CtrlEat.DTOs
     public class StoredIngredientResponse
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string FoodGroup { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string FoodGroup { get; set; } = string.Empty;
         public decimal Calories { get; set; }
     }
 
@@ -20,8 +20,8 @@ namespace CtrlEat.DTOs
 
     public class CreateStorageLocationRequest
     {
-        public string Name { get; set; }
-        public string Type { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
         public decimal MinimumTemperature { get; set; }
         public decimal MaximumTemperature { get; set; }
         public List<int> IngredientIds { get; set; } = new List<int>();
@@ -30,8 +30,8 @@ namespace CtrlEat.DTOs
     public class StorageLocationResponse
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Type { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
         public decimal MinimumTemperature { get; set; }
         public decimal MaximumTemperature { get; set; }
         public List<StoredIngredientResponse> Ingredients { get; set; } = new List<StoredIngredientResponse>();
@@ -41,8 +41,8 @@ namespace CtrlEat.DTOs
     public class GetStorageLocationsRequest
     {
         public int? Id { get; set; }
-        public string Name { get; set; }
-        public string Type { get; set; }
+        public string? Name { get; set; }
+        public string? Type { get; set; }
     }
 
     // ============ GROCERY LIST SERVICE CONTRACTS ============

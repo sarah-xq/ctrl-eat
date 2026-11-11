@@ -27,7 +27,7 @@ namespace CtrlEat.Repositories.Implementations
                 _nextId = data.Max(list => list.Id) + 1;
         }
 
-        public GroceryList GetById(int id)
+        public GroceryList? GetById(int id)
         {
             return _fileHelper.ReadData<GroceryList>()
                 .FirstOrDefault(list => list.Id == id);

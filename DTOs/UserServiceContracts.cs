@@ -8,25 +8,25 @@ namespace CtrlEat.DTOs
     /// </summary>
     public class CreateUserRequest
     {
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
         public int CalorieGoal { get; set; }
     }
 
     public class UpdateUserRequest
     {
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; } // optional, if present will update
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? Password { get; set; } // optional, if present will update
         public int? CalorieGoal { get; set; }
     }
 
     public class UserResponse
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         public int CalorieGoal { get; set; }
         public DateTime CreatedAt { get; set; }
     }
@@ -34,6 +34,6 @@ namespace CtrlEat.DTOs
     public class GetUserRequest
     {
         public int? Id { get; set; }
-        public string Email { get; set; }
+        public string? Email { get; set; }
     }
 }

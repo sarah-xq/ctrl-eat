@@ -9,7 +9,7 @@ namespace CtrlEat.Repositories.Interfaces
     /// </summary>
     public interface IIngredientRepository
     {
-        Ingredient GetById(int id);
+        Ingredient? GetById(int id);
         List<Ingredient> GetAll();
         List<Ingredient> GetByName(string name);
         List<Ingredient> GetByFoodGroup(string foodGroup);

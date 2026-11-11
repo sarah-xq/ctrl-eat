@@ -1,0 +1,71 @@
+@page
+@model DailyMealPlan.Client.Pages.MealPlans.IndexModel
+@{
+    ViewData["Title"] = "Daily meal plans";
+}
+
+<header class="page-header">
+    <div>
+        <h1>Daily meal plans</h1>
+    </div>
+    <nav>
+        <a class="button" asp-page="/MealPlans/Edit">Create plan</a>
+        <form method="post" asp-page="/Account/Logout"><button type="submit">Sign out</button></form>
+    </nav>
+</header>
+
+@if (!string.IsNullOrWhiteSpace(Model.Error))
+{
+    <div class="alert error" role="alert">@Model.Error</div>
+}
+
+<form method="get" class="filter-form">
+    <label asp-for="Date">Filter by date</label>
+    <input asp-for="Date" type="date" />
+    <button type="submit">Filter</button>
+    <a asp-page="/MealPlans/Index">Clear</a>
+</form>
+
+@if (Model.Error is null && Model.Plans.Count == 0)
+{
+    <section class="empty-state">
+        <h2>No meal plans found</h2>
+        <p>Create a plan or clear the date filter.</p>
+    </section>
+}
+else
+{
+    <div class="plan-list">
+        @foreach (var plan in Model.Plans)
+        {
+            <article class="plan-card">
+                <div class="plan-card-header">
+                    <h2>@plan.Date.ToString("yyyy-MM-dd")</h2>
+                    <strong>@plan.TotalCalories.ToString("0.##") calories</strong>
+                </div>
+                <dl>
+                    <dt>Breakfast recipe</dt><dd>@(plan.BreakfastRecipeId?.ToString() ?? "None")</dd>
+                    <dt>Lunch recipe</dt><dd>@(plan.LunchRecipeId?.ToString() ?? "None")</dd>
+                    <dt>Dinner recipe</dt><dd>@(plan.DinnerRecipeId?.ToString() ?? "None")</dd>
+                </dl>
+                @if (plan.Snacks.Count > 0)
+                {
+                    <h3>Snacks</h3>
+                    <ul>
+                        @foreach (var snack in plan.Snacks)
+                        {
+                            <li>@(snack.Name ?? $"Item {snack.ItemId}") — @snack.Quantity @snack.Unit (@snack.Calories.ToString("0.##") calories)</li>
+                        }
+                    </ul>
+                }
+                <div class="actions">
+                    <a class="button secondary" asp-page="/MealPlans/Edit" asp-route-id="@plan.Id">Edit</a>
+                    <form method="post" asp-page-handler="Delete" asp-route-date="@(Model.Date?.ToString("yyyy-MM-dd"))">
+                        <input type="hidden" name="id" value="@plan.Id" />
+                        <button class="danger" type="submit">Delete</button>
+                    </form>
+                </div>
+            </article>
+        }
+    </div>
+}

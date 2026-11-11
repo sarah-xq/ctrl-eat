@@ -27,7 +27,7 @@ namespace CtrlEat.Repositories.Implementations
                 _nextId = data.Max(location => location.Id) + 1;
         }
 
-        public StorageLocation GetById(int id)
+        public StorageLocation? GetById(int id)
         {
             return _fileHelper.ReadData<StorageLocation>()
                 .FirstOrDefault(location => location.Id == id);

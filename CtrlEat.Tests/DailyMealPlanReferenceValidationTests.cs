@@ -165,6 +165,7 @@ public class DailyMealPlanReferenceValidationTests
         var plan = Assert.IsType<DailyMealPlanResponse>(ok.Value);
         Assert.Equal(100, plan.TotalCalories);
         var persisted = context.MealPlanRepository.GetById(created.Id);
+        Assert.NotNull(persisted);
         Assert.Equal(recipe.Id, persisted.BreakfastRecipeId);
         Assert.Equal(100, persisted.TotalCalories);
     }

@@ -1,27 +1,33 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/CtrlEat.RazorClient/CtrlEat.RazorClient.csproj" />
     <Project Path="src/GroceryList.Api/GroceryList.Api.csproj" />
     <Project Path="src/GroceryList.Data/GroceryList.Data.csproj" />
+    <Project Path="src/GroceryList.Domain/GroceryList.Domain.csproj" />
+    <Project Path="src/StorageLocation.Api/StorageLocation.Api.csproj" />
+    <Project Path="src/StorageLocation.Data/StorageLocation.Data.csproj" />
+    <Project Path="src/StorageLocation.Domain/StorageLocation.Domain.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/CtrlEat.RazorClient.Tests/CtrlEat.RazorClient.Tests.csproj" />
     <Project Path="tests/GroceryList.ApiTests/GroceryList.ApiTests.csproj" />
     <Project Path="tests/GroceryList.DataTests/GroceryList.DataTests.csproj" />
     <Project Path="tests/GroceryList.UnitTests/GroceryList.UnitTests.csproj" />
+    <Project Path="tests/StorageLocation.ApiTests/StorageLocation.ApiTests.csproj" />
+    <Project Path="tests/StorageLocation.DataTests/StorageLocation.DataTests.csproj" />
+    <Project Path="tests/StorageLocation.UnitTests/StorageLocation.UnitTests.csproj" />
   </Folder>
   <Project Path="CtrlEat.csproj" />
   <Project Path="CtrlEat.Tests/CtrlEat.Tests.csproj" />
-  <Project Path="src/CtrlEat.RazorClient/CtrlEat.RazorClient.csproj" />
-  <Project Path="src/GroceryList.Domain/GroceryList.Domain.csproj" />
-  <Project Path="src/StorageLocation.Api/StorageLocation.Api.csproj" />
-  <Project Path="src/StorageLocation.Data/StorageLocation.Data.csproj" />
-  <Project Path="src/StorageLocation.Domain/StorageLocation.Domain.csproj" />
+  <Project Path="src/DailyMealPlan.Api/DailyMealPlan.Api.csproj" />
+  <Project Path="src/DailyMealPlan.Client/DailyMealPlan.Client.csproj" />
+  <Project Path="src/DailyMealPlan.Data/DailyMealPlan.Data.csproj" />
+  <Project Path="src/DailyMealPlan.Domain/DailyMealPlan.Domain.csproj" />
   <Project Path="src/User.Api/User.Api.csproj" />
   <Project Path="src/User.Data/User.Data.csproj" />
   <Project Path="src/User.Domain/User.Domain.csproj" />
-  <Project Path="tests/CtrlEat.RazorClient.Tests/CtrlEat.RazorClient.Tests.csproj" />
-  <Project Path="tests/StorageLocation.ApiTests/StorageLocation.ApiTests.csproj" />
-  <Project Path="tests/StorageLocation.DataTests/StorageLocation.DataTests.csproj" />
-  <Project Path="tests/StorageLocation.UnitTests/StorageLocation.UnitTests.csproj" />
+  <Project Path="tests/DailyMealPlan.IntegrationTests/DailyMealPlan.IntegrationTests.csproj" />
+  <Project Path="tests/DailyMealPlan.UnitTests/DailyMealPlan.UnitTests.csproj" />
   <Project Path="tests/User.IntegrationTests/User.IntegrationTests.csproj" />
   <Project Path="tests/User.UnitTests/User.UnitTests.csproj" />
 </Solution>

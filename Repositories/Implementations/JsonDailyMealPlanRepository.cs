@@ -50,7 +50,7 @@ namespace CtrlEat.Repositories.Implementations
             return _fileHelper.ReadData<DailyMealPlan>();
         }
 
-        public DailyMealPlan GetById(int id)
+        public DailyMealPlan? GetById(int id)
         {
             var list = _fileHelper.ReadData<DailyMealPlan>();
             return list.FirstOrDefault(p => p.Id == id);

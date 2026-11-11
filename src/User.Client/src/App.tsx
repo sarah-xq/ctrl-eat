@@ -9,7 +9,7 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [goal, setGoal] = useState<number | null>(null);
+  const [goal, setGoal] = useState<number | null | undefined>(undefined);
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -39,6 +39,7 @@ export default function App() {
 
   useEffect(() => {
     if (!user) return;
+    setGoal(undefined);
     setLoading(true);
     setError(null);
     void readGoal(user)
@@ -97,7 +98,7 @@ export default function App() {
       </header>
       {loading ? <p aria-busy="true">Loading your saved goal…</p> : (
         <>
-          <p className="current">{goal === null ? "No goal saved yet." : `Current saved goal: ${goal} calories`}</p>
+          {goal !== undefined && <p className="current">{goal === null ? "No goal saved yet." : `Current saved goal: ${goal} calories`}</p>}
           <form onSubmit={save} noValidate>
             <label htmlFor="calorieGoal">Daily calorie goal</label>
             <input id="calorieGoal" name="calorieGoal" type="number" min="1" step="1" required

@@ -5,8 +5,8 @@ namespace CtrlEat.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        User GetById(int id);
-        User GetByEmail(string email);
+        User? GetById(int id);
+        User? GetByEmail(string email);
         List<User> GetAll();
         int Create(User user);
         void Update(User user);

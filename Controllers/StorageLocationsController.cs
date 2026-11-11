@@ -21,8 +21,8 @@ namespace CtrlEat.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(List<StorageLocationResponse>), 200)]
         public ActionResult<List<StorageLocationResponse>> GetStorageLocations(
-            [FromQuery] string name = null,
-            [FromQuery] string type = null)
+            [FromQuery] string? name = null,
+            [FromQuery] string? type = null)
         {
             var results = _service.SearchStorageLocations(new GetStorageLocationsRequest
             {

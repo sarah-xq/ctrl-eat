@@ -5,7 +5,7 @@ namespace CtrlEat.Repositories.Interfaces
 {
     public interface IDailyMealPlanRepository
     {
-        DailyMealPlan GetById(int id);
+        DailyMealPlan? GetById(int id);
         List<DailyMealPlan> GetAll();
         List<DailyMealPlan> GetByUserId(int userId);
         int Create(DailyMealPlan plan);
