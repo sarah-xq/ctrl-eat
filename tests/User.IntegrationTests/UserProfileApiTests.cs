@@ -40,12 +40,16 @@ public sealed class UserProfileApiTests : IDisposable
         });
 
     private string Token(string subject = "alice", string scope = "users.read users.write",
-        string issuer = Issuer, string audience = Audience, bool expired = false, RSA? otherKey = null)
+        string issuer = Issuer, string audience = Audience, bool expired = false, RSA? otherKey = null,
+        bool includeSubject = true)
     {
         var now = DateTime.UtcNow;
         var key = new RsaSecurityKey(otherKey ?? signingKey) { KeyId = "test" };
+        var claims = includeSubject
+            ? new[] { new Claim("sub", subject), new Claim("scope", scope) }
+            : new[] { new Claim("scope", scope) };
         var jwt = new JwtSecurityToken(issuer, audience,
-            [new Claim("sub", subject), new Claim("scope", scope)], now.AddHours(-2),
+            claims, now.AddHours(-2),
             expired ? now.AddHours(-1) : now.AddMinutes(10), new SigningCredentials(key, SecurityAlgorithms.RsaSha256));
         return new JwtSecurityTokenHandler().WriteToken(jwt);
     }
@@ -71,7 +75,7 @@ public sealed class UserProfileApiTests : IDisposable
         Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/users/me")).StatusCode);
         using var forged = RSA.Create(2048);
         foreach (var token in new[] { "garbage", Token(expired: true), Token(issuer: "https://impostor.test"),
-            Token(audience: "elsewhere"), Token(otherKey: forged) })
+            Token(audience: "elsewhere"), Token(otherKey: forged), Token(includeSubject: false) })
         {
             UseToken(client, token);
             Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/users/me")).StatusCode);
