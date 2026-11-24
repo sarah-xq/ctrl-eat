@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using User.Domain.Entities;
 using User.Api.Security;
 using User.Api.Services;
 using User.Data;
@@ -24,6 +25,13 @@ public partial class Program
             options.UseSqlite(builder.Configuration.GetConnectionString("User")));
         builder.Services.AddScoped<UserProfileRepository>();
         builder.Services.AddScoped<UserProfileService>();
+        builder.Services.AddScoped<UserProfilePictureService>();
+        var pictureStoragePath = builder.Environment.IsDevelopment()
+            ? builder.Configuration["ProfilePictures:StoragePath"] ?? "profile-pictures"
+            : builder.Configuration["ProfilePictures:StoragePath"]
+                ?? throw new InvalidOperationException("ProfilePictures:StoragePath is required outside Development.");
+        builder.Services.AddSingleton<IProfilePictureStorage>(
+            new LocalProfilePictureStorage(Path.GetFullPath(pictureStoragePath)));
         builder.Services.AddControllers();
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
