@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using User.Api.Security;
 using User.Api.Services;
 
 namespace User.Api.Controllers;
@@ -9,7 +10,7 @@ namespace User.Api.Controllers;
 public sealed class UsersController(UserProfileService service) : ControllerBase
 {
     [HttpGet("me")]
-    [Authorize(Policy = "users.read")]
+    [Authorize(Policy = SecurityPolicies.UsersRead)]
     public async Task<ActionResult<CalorieGoalResponse>> GetMe(CancellationToken ct)
     {
         var identity = GetIdentity();
@@ -18,7 +19,7 @@ public sealed class UsersController(UserProfileService service) : ControllerBase
     }
 
     [HttpPut("me/calorie-goal")]
-    [Authorize(Policy = "users.write")]
+    [Authorize(Policy = SecurityPolicies.UsersWrite)]
     public async Task<ActionResult<CalorieGoalResponse>> SetCalorieGoal(
         [FromBody] CalorieGoalRequest? request,
         CancellationToken ct)

@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using User.Api.Security;
 using User.Api.Services;
 using User.Data;
 
@@ -14,6 +15,10 @@ public partial class Program
             ?? throw new InvalidOperationException("Authentication:Authority is required.");
         var audience = builder.Configuration["Authentication:Audience"]
             ?? throw new InvalidOperationException("Authentication:Audience is required.");
+        var requireHttpsMetadata = builder.Configuration.GetValue<bool?>("Authentication:RequireHttpsMetadata")
+            ?? !(builder.Environment.IsDevelopment()
+                && Uri.TryCreate(authority, UriKind.Absolute, out var authorityUri)
+                && authorityUri.Host is "localhost" or "127.0.0.1" or "::1");
 
         builder.Services.AddDbContext<UserDbContext>(options =>
             options.UseSqlite(builder.Configuration.GetConnectionString("User")));
@@ -27,9 +32,7 @@ public partial class Program
                 options.Authority = authority;
                 options.Audience = audience;
                 options.MapInboundClaims = false;
-                options.RequireHttpsMetadata = !(builder.Environment.IsDevelopment()
-                    && Uri.TryCreate(authority, UriKind.Absolute, out var authorityUri)
-                    && authorityUri.Host is "localhost" or "127.0.0.1" or "::1");
+                options.RequireHttpsMetadata = requireHttpsMetadata;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
@@ -60,11 +63,11 @@ public partial class Program
 
         builder.Services.AddAuthorization(options =>
         {
-            options.AddPolicy("users.read", policy => policy
+            options.AddPolicy(SecurityPolicies.UsersRead, policy => policy
                 .RequireAuthenticatedUser()
                 .RequireAssertion(context => !string.IsNullOrWhiteSpace(context.User.FindFirst("sub")?.Value))
                 .RequireAssertion(context => HasScope(context.User, "users.read")));
-            options.AddPolicy("users.write", policy => policy
+            options.AddPolicy(SecurityPolicies.UsersWrite, policy => policy
                 .RequireAuthenticatedUser()
                 .RequireAssertion(context => !string.IsNullOrWhiteSpace(context.User.FindFirst("sub")?.Value))
                 .RequireAssertion(context => HasScope(context.User, "users.write")));
