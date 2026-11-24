@@ -239,6 +239,52 @@ public sealed class UserProfileApiTests : IDisposable
         Assert.Equal(HttpStatusCode.NotFound, read.StatusCode);
     }
 
+    [Fact]
+    public async Task CrossDeviceWorkflowUsesIndependentSessionsAndSharedPicture()
+    {
+        using var host = OpenApi();
+        using var deviceA = host.CreateClient();
+        using var deviceB = host.CreateClient();
+        using var otherUser = host.CreateClient();
+
+        var deviceAToken = Token(subject: "cross-device-user");
+        var deviceBToken = Token(subject: "cross-device-user");
+        UseToken(deviceA, deviceAToken);
+        UseToken(deviceB, deviceBToken);
+        UseToken(otherUser, Token(subject: "other-user"));
+
+        var jpeg = new byte[] { 0xFF, 0xD8, 0x01, 0x02, 0xFF, 0xD9 };
+        using var upload = new MultipartFormDataContent();
+        var file = new ByteArrayContent(jpeg);
+        file.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+        upload.Add(file, "file", "profile.jpg");
+
+        using var uploaded = await deviceA.PutAsync("/api/users/me/profile-picture", upload);
+        Assert.Equal(HttpStatusCode.OK, uploaded.StatusCode);
+
+        using var deviceBRead = await deviceB.GetAsync("/api/users/me/profile-picture");
+        Assert.Equal(HttpStatusCode.OK, deviceBRead.StatusCode);
+        Assert.Equal(jpeg, await deviceBRead.Content.ReadAsByteArrayAsync());
+
+        using var otherRead = await otherUser.GetAsync("/api/users/me/profile-picture");
+        Assert.Equal(HttpStatusCode.NotFound, otherRead.StatusCode);
+
+        using var otherUpload = new MultipartFormDataContent();
+        var otherFile = new ByteArrayContent(jpeg);
+        otherFile.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+        otherUpload.Add(otherFile, "file", "profile.jpg");
+        using var deniedUpload = await otherUser.PutAsync(
+            "/api/users/me/profile-picture",
+            otherUpload);
+        Assert.Equal(HttpStatusCode.OK, deniedUpload.StatusCode);
+
+        using var deviceBImageAgain = await deviceB.GetAsync("/api/users/me/profile-picture");
+        Assert.Equal(HttpStatusCode.OK, deviceBImageAgain.StatusCode);
+
+        using var deviceAImageAgain = await deviceA.GetAsync("/api/users/me/profile-picture");
+        Assert.Equal(jpeg, await deviceAImageAgain.Content.ReadAsByteArrayAsync());
+    }
+
     public void Dispose()
     {
         signingKey.Dispose();
