@@ -10,6 +10,8 @@ public class UserProfile
 
     public int? CalorieGoal { get; private set; }
 
+    public ProfilePictureReference? ProfilePicture { get; private set; }
+
     public UserProfile(string issuer, string subject)
     {
         Issuer = issuer;
@@ -24,5 +26,16 @@ public class UserProfile
         }
 
         CalorieGoal = value;
+    }
+
+    public void SetProfilePicture(ProfilePictureReference picture)
+    {
+        ProfilePictureRules.ValidateReference(picture);
+        ProfilePicture = picture;
+    }
+
+    public void ClearProfilePicture()
+    {
+        ProfilePicture = null;
     }
 }

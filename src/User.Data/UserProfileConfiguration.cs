@@ -22,6 +22,18 @@ public sealed class UserProfileConfiguration : IEntityTypeConfiguration<UserProf
         builder.Property(profile => profile.CalorieGoal)
             .HasColumnName("CalorieGoal");
 
+        builder.OwnsOne(profile => profile.ProfilePicture, picture =>
+        {
+            picture.Property(reference => reference.StorageKey)
+                .HasColumnName("ProfilePictureStorageKey");
+            picture.Property(reference => reference.Format)
+                .HasColumnName("ProfilePictureFormat")
+                .HasConversion<string>();
+            picture.Property(reference => reference.SizeBytes)
+                .HasColumnName("ProfilePictureSizeBytes");
+            picture.WithOwner();
+        });
+
         builder.HasIndex(profile => new { profile.Issuer, profile.Subject })
             .IsUnique();
     }
