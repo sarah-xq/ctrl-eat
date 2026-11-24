@@ -26,11 +26,12 @@ public sealed class UserProfileApiTests : IDisposable
     private const string Audience = "ctrleat-users";
     private readonly string database = Path.Combine(Path.GetTempPath(), $"ctrleat-{Guid.NewGuid():N}.db");
     private readonly RSA signingKey = RSA.Create(2048);
-    private readonly string pictureStorage = Path.Combine(
+    private readonly string pictureDirectory = Path.Combine(
         Path.GetTempPath(),
         $"ctrleat-pictures-{Guid.NewGuid():N}");
 
-    private WebApplicationFactory<Program> OpenApi() => new WebApplicationFactory<Program>()
+    private WebApplicationFactory<Program> OpenApi(
+        IProfilePictureStorage? storageService = null) => new WebApplicationFactory<Program>()
         .WithWebHostBuilder(builder =>
         {
             builder.UseSetting("ConnectionStrings:User", $"Data Source={database};Pooling=False");
@@ -46,7 +47,7 @@ public sealed class UserProfileApiTests : IDisposable
                 });
                 services.RemoveAll<IProfilePictureStorage>();
                 services.AddSingleton<IProfilePictureStorage>(
-                    new LocalProfilePictureStorage(pictureStorage));
+                    storageService ?? new LocalProfilePictureStorage(pictureDirectory));
             });
         });
 
@@ -192,13 +193,84 @@ public sealed class UserProfileApiTests : IDisposable
         Assert.Equal(valid, await image.Content.ReadAsByteArrayAsync());
     }
 
+    [Fact]
+    public async Task OversizedAndUnsupportedUploadsAreRejected()
+    {
+        using var host = OpenApi();
+        using var client = host.CreateClient();
+        UseToken(client, Token(subject: "alice"));
+
+        using var unsupported = new MultipartFormDataContent();
+        var gif = new ByteArrayContent("GIF89a".Select(character => (byte)character).ToArray());
+        gif.Headers.ContentType = new MediaTypeHeaderValue("image/gif");
+        unsupported.Add(gif, "file", "profile.gif");
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.PutAsync("/api/users/me/profile-picture", unsupported)).StatusCode);
+
+        using var oversized = new MultipartFormDataContent();
+        var bytes = new byte[ProfilePictureRules.MaximumSizeBytes + 1];
+        var image = new ByteArrayContent(bytes);
+        image.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+        oversized.Add(image, "file", "profile.png");
+        Assert.True((await client.PutAsync("/api/users/me/profile-picture", oversized)).StatusCode
+            is HttpStatusCode.BadRequest or HttpStatusCode.RequestEntityTooLarge);
+    }
+
+    [Fact]
+    public async Task StorageFailureReturnsSafeBadGatewayWithoutSecretDetails()
+    {
+        var storage = new FailingProfilePictureStorage();
+        using var host = OpenApi(storage);
+        using var client = host.CreateClient();
+        UseToken(client, Token(subject: "alice"));
+        var jpeg = new byte[] { 0xFF, 0xD8, 0x01, 0x02, 0xFF, 0xD9 };
+        using var upload = new MultipartFormDataContent();
+        var file = new ByteArrayContent(jpeg);
+        file.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+        upload.Add(file, "file", "profile.jpg");
+
+        using var response = await client.PutAsync("/api/users/me/profile-picture", upload);
+        Assert.Equal(HttpStatusCode.BadGateway, response.StatusCode);
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("storage-secret", body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("account-key", body, StringComparison.OrdinalIgnoreCase);
+
+        using var read = await client.GetAsync("/api/users/me/profile-picture");
+        Assert.Equal(HttpStatusCode.NotFound, read.StatusCode);
+    }
+
     public void Dispose()
     {
         signingKey.Dispose();
         File.Delete(database);
-        if (Directory.Exists(pictureStorage))
+        if (Directory.Exists(pictureDirectory))
         {
-            Directory.Delete(pictureStorage, recursive: true);
+            Directory.Delete(pictureDirectory, recursive: true);
+        }
+    }
+
+    private sealed class FailingProfilePictureStorage : IProfilePictureStorage
+    {
+        public Task<ProfilePictureReference> StoreAsync(
+            string accountKey,
+            ProfilePictureUpload upload,
+            CancellationToken cancellationToken)
+        {
+            throw new IOException("storage-secret: provider credentials must not leak");
+        }
+
+        public Task<Stream?> OpenReadAsync(
+            ProfilePictureReference picture,
+            CancellationToken cancellationToken)
+        {
+            throw new IOException("storage-secret: provider credentials must not leak");
+        }
+
+        public Task DeleteAsync(
+            ProfilePictureReference picture,
+            CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }
