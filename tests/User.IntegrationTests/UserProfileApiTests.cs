@@ -14,6 +14,9 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using User.Data;
+using User.Domain.Entities;
 
 namespace User.IntegrationTests;
 
@@ -23,6 +26,9 @@ public sealed class UserProfileApiTests : IDisposable
     private const string Audience = "ctrleat-users";
     private readonly string database = Path.Combine(Path.GetTempPath(), $"ctrleat-{Guid.NewGuid():N}.db");
     private readonly RSA signingKey = RSA.Create(2048);
+    private readonly string pictureStorage = Path.Combine(
+        Path.GetTempPath(),
+        $"ctrleat-pictures-{Guid.NewGuid():N}");
 
     private WebApplicationFactory<Program> OpenApi() => new WebApplicationFactory<Program>()
         .WithWebHostBuilder(builder =>
@@ -31,12 +37,17 @@ public sealed class UserProfileApiTests : IDisposable
             builder.UseSetting("Authentication:Authority", Issuer);
             builder.UseSetting("Authentication:Audience", Audience);
             builder.ConfigureTestServices(services =>
+            {
                 services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
                     var discovery = new OpenIdConnectConfiguration { Issuer = Issuer };
                     discovery.SigningKeys.Add(new RsaSecurityKey(signingKey) { KeyId = "test" });
                     options.ConfigurationManager = new StaticConfigurationManager<OpenIdConnectConfiguration>(discovery);
-                }));
+                });
+                services.RemoveAll<IProfilePictureStorage>();
+                services.AddSingleton<IProfilePictureStorage>(
+                    new LocalProfilePictureStorage(pictureStorage));
+            });
         });
 
     private string Token(string subject = "alice", string scope = "users.read users.write",
@@ -124,9 +135,70 @@ public sealed class UserProfileApiTests : IDisposable
         Assert.Equal(1800, await Goal(reader));
     }
 
+    [Fact]
+    public async Task ProfilePictureUploadAndPrivateReadUseAuthenticatedAccount()
+    {
+        using var host = OpenApi();
+        using var client = host.CreateClient();
+        UseToken(client, Token(subject: "alice"));
+        var jpeg = new byte[] { 0xFF, 0xD8, 0x01, 0x02, 0xFF, 0xD9 };
+        using var upload = new MultipartFormDataContent();
+        var file = new ByteArrayContent(jpeg);
+        file.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+        upload.Add(file, "file", "profile.jpg");
+
+        using var response = await client.PutAsync("/api/users/me/profile-picture", upload);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var saved = await response.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("Jpeg", saved.GetProperty("format").GetString());
+        Assert.Equal(jpeg.Length, saved.GetProperty("sizeBytes").GetInt64());
+
+        using var image = await client.GetAsync("/api/users/me/profile-picture");
+        Assert.Equal(HttpStatusCode.OK, image.StatusCode);
+        Assert.Equal("image/jpeg", image.Content.Headers.ContentType?.MediaType);
+        Assert.Equal(jpeg, await image.Content.ReadAsByteArrayAsync());
+
+        UseToken(client, Token(subject: "bob"));
+        using var otherImage = await client.GetAsync("/api/users/me/profile-picture");
+        Assert.Equal(HttpStatusCode.NotFound, otherImage.StatusCode);
+    }
+
+    [Fact]
+    public async Task InvalidProfilePictureDoesNotChangeSavedImage()
+    {
+        using var host = OpenApi();
+        using var client = host.CreateClient();
+        UseToken(client, Token(subject: "alice"));
+
+        var valid = new byte[] { 0xFF, 0xD8, 0x01, 0x02, 0xFF, 0xD9 };
+        using (var validUpload = new MultipartFormDataContent())
+        {
+            var file = new ByteArrayContent(valid);
+            file.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+            validUpload.Add(file, "file", "profile.jpg");
+            Assert.Equal(HttpStatusCode.OK,
+                (await client.PutAsync("/api/users/me/profile-picture", validUpload)).StatusCode);
+        }
+
+        using var invalidUpload = new MultipartFormDataContent();
+        var spoofed = new ByteArrayContent("GIF89a".Select(character => (byte)character).ToArray());
+        spoofed.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+        invalidUpload.Add(spoofed, "file", "profile.gif");
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.PutAsync("/api/users/me/profile-picture", invalidUpload)).StatusCode);
+
+        using var image = await client.GetAsync("/api/users/me/profile-picture");
+        Assert.Equal(HttpStatusCode.OK, image.StatusCode);
+        Assert.Equal(valid, await image.Content.ReadAsByteArrayAsync());
+    }
+
     public void Dispose()
     {
         signingKey.Dispose();
         File.Delete(database);
+        if (Directory.Exists(pictureStorage))
+        {
+            Directory.Delete(pictureStorage, recursive: true);
+        }
     }
 }
