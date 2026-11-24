@@ -36,6 +36,30 @@ namespace User.Data.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("Subject");
 
+                    b.OwnsOne("User.Domain.Entities.ProfilePictureReference", "ProfilePicture", b1 =>
+                        {
+                            b1.Property<string>("StorageKey")
+                                .IsRequired()
+                                .HasColumnType("TEXT")
+                                .HasColumnName("ProfilePictureStorageKey");
+
+                            b1.Property<string>("Format")
+                                .IsRequired()
+                                .HasColumnType("TEXT")
+                                .HasColumnName("ProfilePictureFormat");
+
+                            b1.Property<long>("SizeBytes")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("ProfilePictureSizeBytes");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserProfileId");
+
+                            b1.HasKey("UserProfileId");
+
+                            b1.ToTable("Profiles");
+                        });
+
                     b.HasKey("Id");
 
                     b.HasIndex("Issuer", "Subject")

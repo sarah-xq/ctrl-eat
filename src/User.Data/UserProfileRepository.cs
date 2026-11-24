@@ -27,4 +27,44 @@ public sealed class UserProfileRepository(UserDbContext dbContext)
                 "CalorieGoal" = excluded."CalorieGoal";
             """, ct);
     }
+
+    public async Task SaveProfilePictureAsync(
+        UserProfile profile,
+        CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(profile);
+
+        var existing = await dbContext.Profiles.SingleOrDefaultAsync(
+            item => item.Issuer == profile.Issuer && item.Subject == profile.Subject,
+            ct);
+
+        if (existing is null)
+        {
+            dbContext.Profiles.Add(profile);
+        }
+        else
+        {
+            existing.SetProfilePicture(profile.ProfilePicture!);
+        }
+
+        await dbContext.SaveChangesAsync(ct);
+    }
+
+    public async Task ClearProfilePictureAsync(
+        string issuer,
+        string subject,
+        CancellationToken ct)
+    {
+        var profile = await dbContext.Profiles.SingleOrDefaultAsync(
+            item => item.Issuer == issuer && item.Subject == subject,
+            ct);
+
+        if (profile is null)
+        {
+            return;
+        }
+
+        profile.ClearProfilePicture();
+        await dbContext.SaveChangesAsync(ct);
+    }
 }
